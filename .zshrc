@@ -76,7 +76,6 @@ plugins=(
     rust
     sudo
     dirhistory
-    zsh-syntax-highlighting
 )
 
 fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
@@ -104,3 +103,4 @@ export EDITOR='vim'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+source /home/meh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

@@ -21,9 +21,11 @@ config.keys = {
   { key = 'v', mods = 'CTRL', action = act.PasteFrom 'PrimarySelection' },
 }
 
+config.audible_bell = "Disabled"
+
 -- Font Test 01 {} [] ~- +=> iIlL1 oO08 9ghij
 -- Huh, turns out that it uses JetBrains mono and nerd fonts by default!
-config.font_size = 12
+config.font_size = 10
 
 -- config.color_scheme = 'PaperColor Dark (base16)'
 -- config.color_scheme = 'tokyonight'
@@ -31,8 +33,10 @@ config.font_size = 12
 -- config.color_scheme = 'tokyonight_night'
 -- config.color_scheme = 'synthwave'
 -- config.color_scheme = 'JetBrains Darcula'
--- config.color_scheme = 'Atom (Gogh)'
+-- config.color_scheme = 'atom'
+-- config.color_scheme = 'ayu'
 -- config.color_scheme = 'Ayu Dark (Gogh)'
+-- config.color_scheme = 'Atom (Gogh)'
 config.color_scheme = 'atom'
 
 -- and finally, return the configuration to wezterm
