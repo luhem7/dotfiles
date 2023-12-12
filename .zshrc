@@ -103,7 +103,7 @@ export EDITOR='vim'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-source /home/meh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ${HOME}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 autoload -Uz vcs_info
 precmd() { vcs_info }
