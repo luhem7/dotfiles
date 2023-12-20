@@ -112,6 +112,6 @@ precmd() { vcs_info }
 zstyle ':vcs_info:git:*' formats '%b '
 
 setopt PROMPT_SUBST
-PROMPT='%F{green}%*%f %F{blue}%~%f %F{red}${vcs_info_msg_0_}%f%F{yellow}$(virtualenv_prompt_info)%f> '
+PROMPT=$'%F{green}%*%f %F{blue}%~%f %F{red}${vcs_info_msg_0_}%f%F{yellow}$(virtualenv_prompt_info)%f\uea9c '
 
 alias python=python3

@@ -37,7 +37,8 @@ config.font_size = 10
 -- config.color_scheme = 'ayu'
 -- config.color_scheme = 'Ayu Dark (Gogh)'
 -- config.color_scheme = 'Atom (Gogh)'
-config.color_scheme = 'atom'
+-- config.color_scheme = 'atom'
+config.color_scheme = 'Tinacious Design (Dark)'
 
 -- and finally, return the configuration to wezterm
 return config
