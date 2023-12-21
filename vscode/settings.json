@@ -1,8 +1,11 @@
 {
-    "workbench.colorTheme": "Jelly Theme Dark",
+    "workbench.colorTheme": "Tinacious Design",
     "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Droid Sans Mono', 'monospace', monospace",
     "editor.fontVariations": true,
     "editor.fontLigatures": true,
     "git.confirmSync": false,
-    "git.autofetch": true
+    "git.autofetch": true,
+    "vim.handleKeys": {
+        "<C-p>": false
+    }
 }
