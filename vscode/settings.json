@@ -1,0 +1,7 @@
+{
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'CodeNewRoman Nerd Font', 'Hack Nerd Font Mono', 'Droid Sans Mono', 'monospace', monospace",
+    "workbench.colorTheme": "Jelly Theme Dark",
+    "git.autofetch": true,
+    "editor.fontVariations": true,
+    "editor.fontLigatures": true
+}
