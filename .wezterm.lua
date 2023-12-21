@@ -27,17 +27,6 @@ config.audible_bell = "Disabled"
 -- Huh, turns out that it uses JetBrains mono and nerd fonts by default!
 config.font_size = 10
 
--- config.color_scheme = 'PaperColor Dark (base16)'
--- config.color_scheme = 'tokyonight'
--- config.color_scheme = 'Tinacious Design (Dark)'
--- config.color_scheme = 'tokyonight_night'
--- config.color_scheme = 'synthwave'
--- config.color_scheme = 'JetBrains Darcula'
--- config.color_scheme = 'atom'
--- config.color_scheme = 'ayu'
--- config.color_scheme = 'Ayu Dark (Gogh)'
--- config.color_scheme = 'Atom (Gogh)'
--- config.color_scheme = 'atom'
 config.color_scheme = 'Tinacious Design (Dark)'
 
 -- and finally, return the configuration to wezterm
