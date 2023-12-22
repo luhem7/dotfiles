@@ -27,18 +27,18 @@ config.audible_bell = "Disabled"
 
 -- Font Test 01 {} [] ~- +=> iIlL1 oO08 9ghij
 -- Ensure that ligatures work, and the zero should have a dot in it!
-config.font = wezterm.font_with_fallback { 'JetBrainsMono Nerd Font', 'CodeNewRoman Nerd Font'},
+config.font = wezterm.font_with_fallback { 'JetBrainsMono Nerd Font', 'CodeNewRoman Nerd Font'}
 config.font_size = 10
--- config.font_rules = {
---   {
---     intensity = 'Normal',
---     italic = true,
---     font = wezterm.font_with_fallback {
---       family = 'JetBrainsMono Nerd Font',
---       italic = true,
---     },
---   },
--- }
+config.font_rules = {
+  {
+    intensity = 'Normal',
+    italic = true,
+    font = wezterm.font_with_fallback {
+      family = 'JetBrainsMono Nerd Font',
+      italic = true,
+    },
+  },
+}
 
 
 config.color_scheme = 'Tinacious Design (Dark)'
