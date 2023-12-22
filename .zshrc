@@ -112,7 +112,8 @@ precmd() { vcs_info }
 zstyle ':vcs_info:git:*' formats '%b '
 
 setopt PROMPT_SUBST
-PROMPT=$'%F{green}%*%f %F{blue}%~%f %F{red}${vcs_info_msg_0_}%f%F{yellow}$(virtualenv_prompt_info)%f\e[3m\ue602 \e[0m'
+TIME='%F{green}%*%f'
+PROMPT=$'${TIME} %F{blue}%~%f %F{red}${vcs_info_msg_0_}%f%F{yellow}$(virtualenv_prompt_info)%f\e[3m\Uf0798 \e[0m'
 
 alias python=python3
 alias lsd=~/.cargo/bin/lsd
