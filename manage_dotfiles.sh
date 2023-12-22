@@ -25,7 +25,8 @@ case "$1" in
         ;;
     commit)
         echo "Committing..."
-        for file in "${files[@]}"; do
+        for file in "${dotfiles[@]}"; do
+            echo "Copying file ${file}"
             cp ~/"$file" .
         done
         git status
