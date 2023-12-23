@@ -106,18 +106,29 @@ export EDITOR='vim'
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 source ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
+
+# PROMPT MADNESS
 autoload -Uz vcs_info
 precmd() { vcs_info }
-
 zstyle ':vcs_info:git:*' formats '%b '
+
+display_py_env() {
+    if [[ -n "$(virtualenv_prompt_info)" ]]; then
+        echo "%F{yellow}\ue235 %f"
+    else
+        echo ""
+    fi
+}
 
 setopt PROMPT_SUBST
 TIME='%F{green}%*%f'
 PROMPT='${TIME} '\
 '%F{blue}%~%f '\
 '%F{red}${vcs_info_msg_0_}%f'\
-'%F{yellow}$(virtualenv_prompt_info)%f'\
+$'$(display_py_env)'\
 $'\e[3m\Uf0798 \e[0m'
 
+
+# Other env settings
 alias python=python3
 alias lsd=~/.cargo/bin/lsd
