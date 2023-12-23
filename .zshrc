@@ -131,4 +131,5 @@ $'\e[3m\Uf0798 \e[0m'
 
 # Other env settings
 alias python=python3
+alias pyactivate="source .venv/bin/activate"
 alias lsd=~/.cargo/bin/lsd
