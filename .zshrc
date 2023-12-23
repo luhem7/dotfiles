@@ -121,8 +121,10 @@ display_py_env() {
 }
 
 setopt PROMPT_SUBST
-TIME='%F{green}%*%f'
-PROMPT='${TIME} '\
+
+NEWLINE=$'\n'
+PROMPT='${NEWLINE}'\
+'%F{green}%*%f '\
 '%F{blue}%~%f '\
 '%F{red}${vcs_info_msg_0_}%f'\
 $'$(display_py_env)'\
