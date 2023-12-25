@@ -122,11 +122,10 @@ display_py_env() {
 
 setopt PROMPT_SUBST
 
-NEWLINE=$'\n'
-PROMPT='${NEWLINE}'\
+PROMPT=$'%(0?.%F{green}\uf058%f .%F{red}\uf06a%f )'\
 '%F{green}%*%f '\
-'%F{blue}%~%f '\
-'%F{red}${vcs_info_msg_0_}%f'\
+$'%F{blue}\uf115 %4~ %f'\
+$'%F{red}\uf418 ${vcs_info_msg_0_}%f'\
 $'$(display_py_env)'\
 $'\e[3m\Uf0798 \e[0m'
 
