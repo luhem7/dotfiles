@@ -109,17 +109,10 @@ source ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-syntax-highlightin
 
 # PROMPT MADNESS
 autoload -Uz vcs_info
-precmd() {}
-
-zstyle ':vcs_info:git:*' formats '%b '
-display_git_info() {
+precmd() {
     vcs_info
-    if [[ -n "${vcs_info_msg_0_}" ]]; then
-        echo "%F{red}\uf418 ${vcs_info_msg_0_}%f"
-    else
-        echo ""
-    fi
 }
+zstyle ':vcs_info:git:*' formats $'\uf418 %b '
 
 display_py_env() {
     if [[ -n "$(virtualenv_prompt_info)" ]]; then
@@ -134,7 +127,7 @@ setopt PROMPT_SUBST
 PROMPT=$'%(0?.%F{green}\uf058%f .%F{red}\uf06a%f )'\
 '%F{green}%*%f '\
 $'%F{blue}\uf115 %4~ %f'\
-$'$(display_git_info)'\
+$'%F{red}${vcs_info_msg_0_}%f'\
 $'$(display_py_env)'\
 $'\e[3m\Uf0798 \e[0m'
 
