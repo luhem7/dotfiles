@@ -108,15 +108,18 @@ source ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-syntax-highlightin
 
 
 # PROMPT MADNESS
+
+[[ $COLORTERM = *(24bit|truecolor)* ]] || zmodload zsh/nearcolor
+
 autoload -Uz vcs_info
 precmd() {
     vcs_info
 }
-zstyle ':vcs_info:git:*' formats $'\uf418 %b '
+zstyle ':vcs_info:git:*' formats $' \uf418 %b'
 
 display_py_env() {
     if [[ -n "$(virtualenv_prompt_info)" ]]; then
-        echo "%F{yellow}\ue235 %f"
+        echo " %F{yellow}\ue235 %f"
     else
         echo ""
     fi
@@ -124,12 +127,14 @@ display_py_env() {
 
 setopt PROMPT_SUBST
 
-PROMPT=$'%(0?.%F{green}\uf058%f .%F{red}\uf06a%f )'\
-'%F{green}%*%f '\
-$'%F{blue}\uf115 %4~ %f'\
+PROMPT=\
+'['\
+$'%(0?.%F{green}\uf058%f .%F{red}\uf06a%f )'\
+'%F{green}%D{%T}%f '\
+$'%F{blue}\uf115 %4~%f'\
 $'%F{red}${vcs_info_msg_0_}%f'\
 $'$(display_py_env)'\
-$'\e[3m\Uf0798 \e[0m'
+$']'
 
 
 # Other env settings
