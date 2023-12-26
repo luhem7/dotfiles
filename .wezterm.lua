@@ -14,12 +14,22 @@ end
 -- This is where you actually apply your config choices
 
 config.keys = {
-  -- paste from the clipboard
-  { key = 'v', mods = 'CTRL', action = act.PasteFrom 'Clipboard' },
-
-  -- paste from the primary selection
-  { key = 'v', mods = 'CTRL', action = act.PasteFrom 'PrimarySelection' },
+  { key = 'v', mods = 'CMD', action = act.PasteFrom 'Clipboard' },
+  { key = 'v', mods = 'CMD', action = act.PasteFrom 'PrimarySelection' },
+  {
+    key = 'c',
+    mods = 'CMD',
+    action = wezterm.action.CopyTo 'ClipboardAndPrimarySelection',
+  },
+  {
+    key = 'w',
+    mods = 'CMD',
+    action = wezterm.action.CloseCurrentTab { confirm = false },
+  },
 }
+
+config.window_close_confirmation = 'NeverPrompt'
+skip_close_confirmation_for_processes_named = { 'bash', 'sh', 'zsh', 'fish', 'tmux' }
 
 -- LOOK AND FEEL
 
