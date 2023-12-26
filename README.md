@@ -14,6 +14,7 @@ These are my dotfiles. There are many like it, but these are mine!
 
 ## Useful applications
 - *Time Warror* A command line time tracking application. Available through homebrew for MacOS. [Website](https://timewarrior.net)
+- *lsd* A command line drop in replacement for ls that is more feature filled and colorful.
 
 ## Additional Notes
 - The .zshrc file requires a fair amount of manual installation of plugins. The first one being OMZ, and then the other plugins as well

@@ -140,4 +140,17 @@ $']'
 # Other env settings
 alias python=python3
 alias pyactivate="source .venv/bin/activate"
-alias lsd=~/.cargo/bin/lsd
+
+# Sourcing OS specific settings
+if [[ "$(uname)" == "Linux" ]]; then
+    custom_file=".zsh_linux.zsh"
+elif [[ "$(uname)" == "Darwin" ]]; then
+    custom_file=".zsh_macos.zsh"
+else
+    echo "Unsupported operating system."
+    exit 1
+fi
+
+if [ -f "$custom_file" ]; then
+    source "$custom_file"
+fi

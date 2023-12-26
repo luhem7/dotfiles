@@ -1,7 +1,7 @@
 #! /bin/zsh
 
 
-dotfiles=(".wezterm.lua" ".zshrc")
+dotfiles=(".wezterm.lua" ".zshrc" ".zsh_linux.zsh" ".zsh_macos.zsh")
 help_msg='Usage: ./manage_dotfiles.sh [deploy|commit]'
 
 # Check if the number of arguments is exactly 1
