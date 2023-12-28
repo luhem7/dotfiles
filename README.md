@@ -7,7 +7,7 @@ These are my dotfiles. There are many like it, but these are mine!
 3. In VSCode setup the Tinacious Design theme extension
 4. Copy over the vscode/settings.json file over to the VSCode user settings directory.
 5. Install rust eco-system
-6. Run `cargo install lsd`
+6. For Linux only: Run `cargo install lsd`
 
 ## Scripts
 - manage_dotfiles.sh: Mark it as executable and run it from the root of the repo. Use the deploy command to send the to their respective locations. Use the commit command to bring in changes into the repo for possibly being commited for the future.
