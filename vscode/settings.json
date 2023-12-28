@@ -7,5 +7,6 @@
     "git.autofetch": true,
     "vim.handleKeys": {
         "<C-p>": false
-    }
+    },
+    "debug.allowBreakpointsEverywhere": true
 }
