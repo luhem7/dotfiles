@@ -8,5 +8,6 @@
     "vim.handleKeys": {
         "<C-p>": false
     },
-    "debug.allowBreakpointsEverywhere": true
+    "debug.allowBreakpointsEverywhere": true,
+    "rust-analyzer.check.command": "clippy"
 }
