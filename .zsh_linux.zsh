@@ -1,4 +1,9 @@
 #! /bin/zsh
 
-alias lsd=~/.cargo/bin/lsd
 alias nvim='flatpak run io.neovim.nvim'
+
+# Alias ls to lsd if lsd is installed.
+lsd_install_path=~/.cargo/bin/lsd
+if [ -f "$lsd_install_path" ]; then
+    alias ls="$lsd_install_path"
+fi
