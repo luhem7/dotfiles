@@ -87,6 +87,10 @@ $']'
 alias python=python3
 alias pyactivate="source .venv/bin/activate"
 
+#Inserted by nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
 # Sourcing OS specific settings
 if [[ "$(uname)" == "Linux" ]]; then
     custom_file=".zsh_linux.zsh"
