@@ -86,6 +86,8 @@ $']'
 # Other env settings
 alias python=python3
 alias pyactivate="source .venv/bin/activate"
+alias gitca="git commit --amend --reuse-message=HEAD"
+alias gitfp='git push --force-with-lease'
 
 #Inserted by nvm
 export NVM_DIR="$HOME/.nvm"
