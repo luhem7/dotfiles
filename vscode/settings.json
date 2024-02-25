@@ -9,5 +9,30 @@
         "<C-p>": false
     },
     "debug.allowBreakpointsEverywhere": true,
-    "rust-analyzer.check.command": "clippy"
+    "rust-analyzer.check.command": "clippy",
+    "task.allowAutomaticTasks": "on",
+    "indentRainbow.indicatorStyle": "light",
+    "indentRainbow.lightIndicatorStyleLineWidth": 1.5,
+    "indentRainbow.colors": [
+        "rgba(255,255,64,0.3)",
+        "rgba(127,255,127,0.3)",
+        "rgba(255,127,255,0.3)",
+        "rgba(79,236,236,0.3)"
+        ],
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "scope": "metadata",
+                "settings": {
+                    "foreground": "#7c5086"
+                }
+            },
+            {
+                "scope": "card.zettledown",
+                "settings": {
+                    "foreground": "#ffe7a1"
+                }
+            }
+        ]
+    }
 }
