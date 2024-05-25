@@ -107,3 +107,9 @@ fi
 if [ -f "$custom_file" ]; then
     source "$custom_file"
 fi
+
+# Loading up a machine specific script if it exists.
+local_file="$HOME/.local_config.zsh"
+if [[ -f $local_file ]]; then
+    source $local_file
+fi
