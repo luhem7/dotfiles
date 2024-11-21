@@ -34,7 +34,6 @@ plugins=(
     zsh-autosuggestions
     rust
     sudo
-    dirhistory
     virtualenv
 )
 

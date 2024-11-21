@@ -26,6 +26,33 @@ config.keys = {
     mods = 'CMD',
     action = wezterm.action.CloseCurrentTab { confirm = false },
   },
+    -- Word navigation with Alt + arrows
+  {
+    key = "LeftArrow",
+    mods = "ALT",
+    action = wezterm.action.SendKey {
+      key = "b",
+      mods = "ALT",
+    }
+  },
+  {
+    key = "RightArrow",
+    mods = "ALT",
+    action = wezterm.action.SendKey {
+      key = "f",
+      mods = "ALT",
+    }
+  },
+  
+  -- Delete word with Alt + Delete
+  {
+    key = "Delete",
+    mods = "ALT",
+    action = wezterm.action.SendKey {
+      key = "d",
+      mods = "ALT",
+    }
+  },
 }
 
 config.window_close_confirmation = 'NeverPrompt'
