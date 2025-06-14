@@ -13,8 +13,9 @@ These are my dotfiles. There are many like it, but these are mine!
 - manage_dotfiles.sh: Mark it as executable and run it from the root of the repo. Use the deploy command to send the to their respective locations. Use the commit command to bring in changes into the repo for possibly being commited for the future.
 
 ## Useful applications
-- *Time Warror* A command line time tracking application. Available through homebrew for MacOS. [Website](https://timewarrior.net)
+- *wezterm* Wonderful and simple Terminal Emulator for most systems!
 - *lsd* A command line drop in replacement for ls that is more feature filled and colorful.
+- *organize-files* Useful command line python package that helps one to organize files!
 
 ## Additional Notes
 - The .zshrc file requires a fair amount of manual installation of plugins. The first one being OMZ, and then the other plugins as well
