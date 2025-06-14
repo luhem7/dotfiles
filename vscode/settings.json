@@ -9,6 +9,7 @@
     "rust-analyzer.check.command": "clippy",
     "task.allowAutomaticTasks": "on",
     "cSpell.userWords": [
+        "habanero",
         "struct",
         "Tinacious",
         "Zettledown"
