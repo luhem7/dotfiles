@@ -15,7 +15,7 @@ These are my dotfiles. There are many like it, but these are mine!
 ## Useful applications
 - *wezterm* Wonderful and simple Terminal Emulator for most systems!
 - *lsd* A command line drop in replacement for ls that is more feature filled and colorful.
-- *organize-files* Useful command line python package that helps one to organize files!
+- *organize-tool* Useful command line python package that helps one to organize files!
 
 ### Linux applications
 - *piper* LG MX-Master mouse tuning support.
