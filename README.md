@@ -17,6 +17,12 @@ These are my dotfiles. There are many like it, but these are mine!
 - *lsd* A command line drop in replacement for ls that is more feature filled and colorful.
 - *organize-files* Useful command line python package that helps one to organize files!
 
+### Linux applications
+- *piper* LG MX-Master mouse tuning support.
+- *dolphin* Excellent file browser
+- *python3-pip* Support for running pip as a stand alone application
+- *multi-mc* Wonderful Minecraft client with mod versioning management (and more!)
+
 ## Additional Notes
 - The .zshrc file requires a fair amount of manual installation of plugins. The first one being OMZ, and then the other plugins as well
 - Copy of VSCode User settings.json is included as vscode/settings.json.
