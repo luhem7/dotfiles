@@ -66,5 +66,7 @@
     },
     "extensions.experimental.affinity": {
         "vscodevim.vim": 1
-    }
+    },
+    "telemetry.feedback.enabled": false,
+    "telemetry.telemetryLevel": "off"
 }
