@@ -48,7 +48,7 @@ The default pacman mirrors, worked and continue to work well for me.
 These are the packages I installed:
 `base linux linux-firmware intel-ucode vim man-db man-pages texinfo`
 These are the packages I installed later that I wished I installed up front:
-`sudo vi`
+`sudo vi polkit zsh`
 I think it's best not to install nVidia related things at this point.
 
 ### Configure the filesystem
@@ -62,7 +62,7 @@ I did not create a fstab file at this point. I might need to revise this later i
 Following the same guide from above:
 
 **Time, Localization, Hostname**
-I followed the guide verbatim
+I followed the guide verbatim.
 
 ### Preparing the kernel and boot-loader
 For this, I had to go back to [the 2.5 Configuring mkinitcpio section of the encryption setup guide](https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#LUKS_on_a_partition)
@@ -95,10 +95,7 @@ Like above, the `esp` on this page mapped to `/boot` for me. It pretty much work
 
 After that I followed the steps on the same page under sections **1.1.3 pacman hook** and **1.1.4 Building the UKIs**. After the kernel images were built, I verified by `ls /boot/EFI/Linux/` and making sure I see a `arch-linux.efi` file there.
 
-
-
-**Recreating the initramfs**
-
+Note: At this point `mkinitcpio -P` should;ve run successfully atleast once.
 
 ### Testing the setup
 At this point, I rebooted the system using `systemctl reboot` and checked to see if I could boot into the installed OS successfully.
@@ -122,7 +119,20 @@ At this point, I rebooted the system using `systemctl reboot` and checked to see
 ### Setting the root password
 `passwd` as simple as that
 
-### Conclusion
-At this point, I had a minimal arch os setup on my drive. My next steps are [detailed here](./arch_linux/userland_setup.md)
+### User setup
+Here we switch over to the [General Recommendations Guide](https://wiki.archlinux.org/title/General_recommendations). Starting with **1.1 Users and Groups**
+
+This actually takes us to the [Users and groups](https://wiki.archlinux.org/title/Users_and_groups#User_management) which honestly is pretty straight forward. I setup a user account and made sure to make them part of the `wheel` group. I forgot to do this, but now is a good time to specify zsh as the default shell for this user.
+
+Next we take a slight tangent to [Sudo config](https://wiki.archlinux.org/title/Sudo). As part of this, we use `visudo` and just ensure that all members of the group wheel have sudo access. There are some good tips here, including disabling root access, but I'm too chicken shit to actually do that on this system.
+
+There are some good recommendations on the [Security page](https://wiki.archlinux.org/title/Security), but I only followed two of them that involved modifying `/etc/security/faillock.conf`:
+- allow 5 login attempts before a user is timed out instead of 3.
+- make lock time outs persist across system reboots
+
+**TODO** Setup firewalls here when you decide to open up this system to LAN.
+
+# Conclusion
+At this point, I had a minimal arch os setup on my drive. My next steps are [detailed here](./arch_linux/0_userland.md)
 
 **TODO** Do I need to specify a pacman hook to rebuild the kernel whenever the nvidia driver package is updated?
