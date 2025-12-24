@@ -46,9 +46,10 @@ At this this point, the partitions where mounted, and I didn't have to do anythi
 I went back to section **2. Installation** on the [Installation Guide](https://wiki.archlinux.org/title/Installation_guide)
 The default pacman mirrors, worked and continue to work well for me.
 These are the packages I installed:
-`base linux linux-firmware intel-ucode vi vim man-db man-pages texinfo`
+`base linux linux-firmware intel-ucode vim man-db man-pages texinfo`
 These are the packages I installed later that I wished I installed up front:
-`sudo`
+`sudo vi`
+I think it's best not to install nVidia related things at this point.
 
 ### Configure the filesystem
 **Fstab**
@@ -63,10 +64,51 @@ I followed the guide verbatim
 ### Preparing the kernel and boot-loader
 For this, I had to go back to [the 2.5 Configuring mkinitcpio section of the encryption setup guide](https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#LUKS_on_a_partition)
 
+Picking up from **2.5 Configuring mkinitcpio**:
+
 This is what I neded up putting in my `/etc/mkinitcpio.conf`:
 `HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems fsck)`
 (as in, I only added the single sd-encrypt before filesystems)
 
-But, then i turned out that I needed to specify particular kernel parameters which lead to a long sidequest on boot-loaders and how to build the kernel. In the end, I decided to use a simple [Unified kernel image](https://wiki.archlinux.org/title/Unified_kernel_image)!
+And then under **2.6 Configuing the boot loader**:
+
+Turns out that I needed to specify particular kernel parameters which lead to a long sidequest on boot-loaders and how to build the kernel. In the end, I decided to use a simple [Unified kernel image](https://wiki.archlinux.org/title/Unified_kernel_image)!
+
+And specifically under that, I decided to go with the more tedious vanilla option of having mkinitcpio assemble the UKI for me. On this page describing the generation of the UKI, `_esp_` mapped to `/boot/` because I was in the chroot environment. 
+
+Back on the `luks_on_a_partition` page (yes, lots of flipping back and forth between references here) where it says that we need to specify a kernel parameter that looks like this:
+```
+rd.luks.name=1082fcb1-9b0a-480f-86b8-fc52c135a563=root root=/dev/mapper/root
+```
+I put my corresponding setting into `/etc/cmdline.d/unencrypt.conf` using the following command: (again, in this example /dev/sda/ was the OS drive, with sda2 being the cryto LUKS partition)
+```bash
+echo "rd.luks.name=$(lsblk -dno UUID /dev/sda2)=root root=/dev/mapper/root" > /etc/cmdline.d/unencrypt.conf
+```
+
+Now, back on the `Unified_kernel_image` page under **1.1.2 .preset file**
+**TODO Continue here**
+
+**Recreating the initramfs**
+
+
+### Testing the setup
+At this point, I rebooted the system using `systemctl reboot` and checked to see if I could boot into the installed OS successfully.
+
+-------------------------------------------------------------
+**Aside on Troubleshooting the boot loader**
+During this process, there were many times when I rebooted and realised that I messed up some configuration somewhere. During this time, I simply booted from the install medium again, unencrypted the partition, mounted the partition and chroot'ed into the partition.
+- Unencrypting the root partition:
+```bash
+cryptsetup open /dev/sda2 root
+```
+- Mounting the partitions:
+```bash
+mount /dev/mapper/root /mnt 
+mount /dev/sda1 /mnt/boot
+```
+- Chroot into the parition: `arch-chroot /mnt`. 
+- Then proceed where you left off.
+-------------------------------------------------------------
+
 
 **TODO** Do I need to specify a pacman hook to rebuild the kernel whenever the nvidia driver package is updated?
