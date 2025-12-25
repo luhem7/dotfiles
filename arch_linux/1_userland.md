@@ -1,7 +1,7 @@
 # Userland setup
 Unlike the previous article, here everything happens while logged in as the primary user (and not root)
 
-### Networking setup
+## Networking setup
 Jumping forward a bit, we go to **7. Networking** on the [General Recommendations Guide](https://wiki.archlinux.org/title/General_recommendations)
 
 I went to [Network Configuration](https://wiki.archlinux.org/title/Network_configuration).
@@ -52,6 +52,19 @@ At this point, I restarted just to ensure that the drivers were loading up right
 Running `nvidia-smi` should print my current GPU name and VRAM usage.
 
 There's also a neat utility called `nvtop` that works like `htop` but for nVidia GPU utilization!
+
+
+## Allowing system suspend without needing password
+Do these steps at this point for sanity's sake.
+```bash
+sudo cp ./arch_linux/polkit/10-enable-suspend-wheel.rules /etc/polkit-1/rules.d/10-enable-suspend-wheel.rules
+sudo chown root:polkitd /etc/polkit-1/rules.d/10-enable-suspend-wheel.rules
+sudo chmod 644 /etc/polkit-1/rules.d/10-enable-suspend-wheel.rules
+sudo systemctl reload polkit
+```
+
+
+
 
 **TODO** Lots of good recommendations on this page, particularly around limiting vram usage for certain applications. See section **2.3 nvidia-application-profiles.rc.d** in [this section](https://wiki.archlinux.org/title/NVIDIA#Wayland_configuration)
 
