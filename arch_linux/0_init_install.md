@@ -48,7 +48,7 @@ The default pacman mirrors, worked and continue to work well for me.
 These are the packages I installed:
 `base linux linux-firmware intel-ucode vim man-db man-pages texinfo`
 These are the packages I installed later that I wished I installed up front:
-`sudo vi polkit zsh`
+`sudo vi polkit zsh htop`
 I think it's best not to install nVidia related things at this point.
 
 ### Configure the filesystem
@@ -130,7 +130,6 @@ There are some good recommendations on the [Security page](https://wiki.archlinu
 - allow 5 login attempts before a user is timed out instead of 3.
 - make lock time outs persist across system reboots
 
-**TODO** Setup firewalls here when you decide to open up this system to LAN.
 
 # Conclusion
 At this point, I had a minimal arch os setup on my drive. My next steps are [detailed here](./arch_linux/0_userland.md)
