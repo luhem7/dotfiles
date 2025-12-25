@@ -53,6 +53,8 @@ Running `nvidia-smi` should print my current GPU name and VRAM usage.
 
 There's also a neat utility called `nvtop` that works like `htop` but for nVidia GPU utilization!
 
+**TODO** Lots of good recommendations on this page, particularly around limiting vram usage for certain applications. See section **2.3 nvidia-application-profiles.rc.d** in [this section](https://wiki.archlinux.org/title/NVIDIA#Wayland_configuration)
+
 
 ## Allowing system suspend without needing password
 Do these steps at this point for sanity's sake.
@@ -63,9 +65,39 @@ sudo chmod 644 /etc/polkit-1/rules.d/10-enable-suspend-wheel.rules
 sudo systemctl reload polkit
 ```
 
+## Setting up a Desktop
+I'm currently going with the [hyprland eco-system](https://wiki.archlinux.org/title/Hyprland). As noted on the page, it is good to take a look at the [Hyprland Nvidia page](https://wiki.hypr.land/Nvidia/), but I had already implemented the recommendations here!
+
+Next, I copied a default Hyprland config over to my user config:
+```bash
+cp /usr/share/hypr/hyprland.conf ~/.config/hypr/hyprland.conf
+```
+and then I added the following lines to the top of that file
+```
+env = LIBVA_DRIVER_NAME,nvidia
+env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+```
+But really, this is already present in the included hyprland config in this repo.
+
+After this, I installed Hyprland and also followed the installation guide on [their official website](https://wiki.hypr.land/Getting-Started/Master-Tutorial/)
+
+During this setup I had to install the following mandatory and highly recommended packages:
+
+```bash
+sudo pacman -S pipewire wireplumber xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent kitty dolphin wofi firefox qt5-wayland qt6-wayland
+```
+
+I believe that I'm supposed to be starting Hyprland via usm, but I'm happy enough starting it manually by typeing `Hyprland` on the command line after login!
+
+**TODO** Being able to lock and unlock the screen
+
+**TODO** having the screen lock before I put it to sleep
+
+## Sound
 
 
+## Fetch today's weather
+`curl 'v2.wttr.in/Raleigh?u'`
 
-**TODO** Lots of good recommendations on this page, particularly around limiting vram usage for certain applications. See section **2.3 nvidia-application-profiles.rc.d** in [this section](https://wiki.archlinux.org/title/NVIDIA#Wayland_configuration)
 
 

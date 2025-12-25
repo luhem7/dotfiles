@@ -48,7 +48,7 @@ The default pacman mirrors, worked and continue to work well for me.
 These are the packages I installed:
 `base linux linux-firmware intel-ucode vim man-db man-pages texinfo`
 These are the packages I installed later that I wished I installed up front:
-`sudo vi polkit zsh htop`
+`sudo vi polkit zsh htop usbutils`
 I think it's best not to install nVidia related things at this point.
 
 ### Configure the filesystem
