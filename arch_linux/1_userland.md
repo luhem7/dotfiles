@@ -79,22 +79,33 @@ env = __GLX_VENDOR_LIBRARY_NAME,nvidia
 ```
 But really, this is already present in the included hyprland config in this repo.
 
-After this, I installed Hyprland and also followed the installation guide on [their official website](https://wiki.hypr.land/Getting-Started/Master-Tutorial/)
-
-During this setup I had to install the following mandatory and highly recommended packages:
+Along with installing Hyprland I had to install the following mandatory and highly recommended packages:
 
 ```bash
-sudo pacman -S pipewire wireplumber xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent kitty dolphin wofi firefox qt5-wayland qt6-wayland
+sudo pacman -S pipewire wireplumber hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent kitty dolphin wofi firefox qt5-wayland qt6-wayland
 ```
+
+After this, I also followed the installation guide on [their official website](https://wiki.hypr.land/Getting-Started/Master-Tutorial/)
 
 I believe that I'm supposed to be starting Hyprland via usm, but I'm happy enough starting it manually by typeing `Hyprland` on the command line after login!
 
-**TODO** Being able to lock and unlock the screen
+**Locking the screen before going to sleep**
+Hyprlock takes care of locking the screen and Hypridl is a idle management daemon that takes care of firing off events related to the desktop being idle or going to sleep.
 
-**TODO** having the screen lock before I put it to sleep
+First, copy over the config files in this repo to `~/.config/hypr/`. Then install the required packages.
+```
+sudo pacman -S hyprlock hypridle
+```
+Logout of the desktop and login to verify that these changes have taken effect.
+
+
 
 ## Sound
+This section is something I need to refine. What I found is that arch was able to successfully detect my audio device, but it didn't make it the default. I'm currently targetting using [pipewire](https://wiki.archlinux.org/title/PipeWire) and [wireplumber](https://wiki.archlinux.org/title/WirePlumber) for all of the sound manangement and trying not to use pulse audio as much as possible.
 
+The `qpwgraph` utility has been useful so far in ensuring I have the right sets of inputs and puts setup.
+
+We can run `speaker-test -c 2 -l 1` to play a sound through the front stereo speakers to see if the settings are working.
 
 ## Fetch today's weather
 `curl 'v2.wttr.in/Raleigh?u'`
