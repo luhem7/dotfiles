@@ -82,7 +82,7 @@ But really, this is already present in the included hyprland config in this repo
 Along with installing Hyprland I had to install the following mandatory and highly recommended packages:
 
 ```bash
-sudo pacman -S pipewire wireplumber hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent kitty dolphin wofi firefox qt5-wayland qt6-wayland
+sudo pacman -S pipewire wireplumber wiremix hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent kitty dolphin wofi firefox qt5-wayland qt6-wayland
 ```
 
 After this, I also followed the installation guide on [their official website](https://wiki.hypr.land/Getting-Started/Master-Tutorial/)
@@ -114,7 +114,9 @@ If the service fails to start use the following command to check what failed `jo
 
 We can run `speaker-test -c 2 -l 1` to play a sound through the front stereo speakers to see if the settings are working.
 
-The `qpwgraph` utility has been useful so far in ensuring I have the right sets of inputs and puts setup hooked up together.
+### Useful Sound utilities
+- `wiremix` a feature rich TUI with the ability to set default sources and sinks and even do application specific routing of sources of sinks. This is like the old pavucontrol!
+- `qpwgraph` A utility has been useful so far in ensuring I have the right sets of inputs and puts setup hooked up together.
 
 
 ## Fetch today's weather
