@@ -92,7 +92,7 @@ I believe that I'm supposed to be starting Hyprland via usm, but I'm happy enoug
 **Locking the screen before going to sleep**
 Hyprlock takes care of locking the screen and Hypridl is a idle management daemon that takes care of firing off events related to the desktop being idle or going to sleep.
 
-First, copy over the config files in this repo to `~/.config/hypr/`. Then install the required packages.
+First, copy over the config files in this repo to `~/.config/hypr/`. Then install the required packages. It is important that we copy over the config files first as hyprlock might just draw a blank screen instead of 
 ```
 sudo pacman -S hyprlock hypridle
 ```
@@ -103,9 +103,30 @@ Logout of the desktop and login to verify that these changes have taken effect.
 ## Sound
 This section is something I need to refine. What I found is that arch was able to successfully detect my audio device, but it didn't make it the default. I'm currently targetting using [pipewire](https://wiki.archlinux.org/title/PipeWire) and [wireplumber](https://wiki.archlinux.org/title/WirePlumber) for all of the sound manangement and trying not to use pulse audio as much as possible.
 
-The `qpwgraph` utility has been useful so far in ensuring I have the right sets of inputs and puts setup.
+First, I wanted to lower the priority of my motherboard's optical and HDMI outputs. I wrote the necessary configuration user directory + snippets under `./config/wireplumber/` that should be copied to the corresponding directory structure in the home directory. Notably, I had to ensure that I was using configuration snippets in the `wireplumber.conf.d` directory because if I supplied just a single configuration file, it never read the global configuration file and wireplumber fails to start!
+
+After copying the config snippets, we can restart the service (which is running at the user level!) and check the status as so:
+```bash
+systemctl --user start wireplumber
+systemctl --user status wireplumber
+```
+If the service fails to start use the following command to check what failed `journalctl --user -u wireplumber -n 50`. After fixing the issue, the systemctl failure status flag needs to be reset before restarting the service: `systemctl --user reset-failed wireplumber`
 
 We can run `speaker-test -c 2 -l 1` to play a sound through the front stereo speakers to see if the settings are working.
+
+The `qpwgraph` utility has been useful so far in ensuring I have the right sets of inputs and puts setup hooked up together.
+
+
+## Fonts
+I like a particular monospace font!
+```bash
+sudo pacman ttf-jetbrains-mono-nerd
+mkdir -p ~/.config/fontconfig
+cp ./arch_linux/config/fontconfig/fonts.conf ~/.config/fontconfig/
+fc-cache -rv
+``` 
+That should enable JetBrains as the default monospace font.
+
 
 ## Fetch today's weather
 `curl 'v2.wttr.in/Raleigh?u'`
