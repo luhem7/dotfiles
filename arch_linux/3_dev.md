@@ -10,4 +10,5 @@ fc-cache -rv
 ``` 
 That should enable JetBrains as the default monospace font.
 
-
+## OMZ
+OMZ install worked perfectly from the command line!
