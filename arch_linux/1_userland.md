@@ -117,17 +117,6 @@ We can run `speaker-test -c 2 -l 1` to play a sound through the front stereo spe
 The `qpwgraph` utility has been useful so far in ensuring I have the right sets of inputs and puts setup hooked up together.
 
 
-## Fonts
-I like a particular monospace font!
-```bash
-sudo pacman ttf-jetbrains-mono-nerd
-mkdir -p ~/.config/fontconfig
-cp ./arch_linux/config/fontconfig/fonts.conf ~/.config/fontconfig/
-fc-cache -rv
-``` 
-That should enable JetBrains as the default monospace font.
-
-
 ## Fetch today's weather
 `curl 'v2.wttr.in/Raleigh?u'`
 
