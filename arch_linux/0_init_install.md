@@ -29,7 +29,7 @@ If one only needs the UUIDs for the drives, then `lsblk -f` suffices (and doesn'
 I used fdisk for this, it was easy enough to create the partition plans before applying them.
 - First I deleted existing partitions on the disk
 - Then I made a new GPT table on the disk
-- First I created a partition of size +4G (That's +4 Gibibytes), then set it's type as boot. This was going to be `/boot` (partition /dev/sda1)
+- First I created a partition of size +4G (That's +4 Gibibytes), then set it's type as `EFI boot` (This was option 1 in the list). This was going to be `/boot` (partition /dev/sda1)
 - Next, I created a partition that went to the end of the drive, then set it's type to Linux Root System 64 bit (it was type #23 in the list). This was going to be `/` (partiion /dev/sda2)
 - Finally I wrote this partition scheme to the disk
 
@@ -48,7 +48,7 @@ The default pacman mirrors, worked and continue to work well for me.
 These are the packages I installed:
 `base linux linux-firmware intel-ucode vim man-db man-pages texinfo`
 These are the packages I installed later that I wished I installed up front:
-`sudo vi polkit zsh htop usbutils wl-clipboard`
+`sudo vi polkit zsh htop usbutils wl-clipboard base-devel`
 I think it's best not to install nVidia related things at this point.
 
 ### Configure the filesystem
