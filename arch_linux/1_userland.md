@@ -87,10 +87,10 @@ sudo pacman -S pipewire wireplumber wiremix hyprland xdg-desktop-portal-hyprland
 
 After this, I also followed the installation guide on [their official website](https://wiki.hypr.land/Getting-Started/Master-Tutorial/)
 
-I believe that I'm supposed to be starting Hyprland via usm, but I'm happy enough starting it manually by typeing `Hyprland` on the command line after login!
+I believe that I'm supposed to be starting Hyprland via usm, but I'm happy enough starting it manually by typeing `start-hyprland` on the command line after login!
 
 **Locking the screen before going to sleep**
-Hyprlock takes care of locking the screen and Hypridl is a idle management daemon that takes care of firing off events related to the desktop being idle or going to sleep.
+Hyprlock takes care of locking the screen and Hypridle is a idle management daemon that takes care of firing off events related to the desktop being idle or going to sleep.
 
 First, copy over the config files in this repo to `~/.config/hypr/`. Then install the required packages. It is important that we copy over the config files first as hyprlock might just draw a blank screen instead of 
 ```
