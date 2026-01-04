@@ -46,9 +46,7 @@ At this this point, the partitions where mounted, and I didn't have to do anythi
 I went back to section **2. Installation** on the [Installation Guide](https://wiki.archlinux.org/title/Installation_guide)
 The default pacman mirrors, worked and continue to work well for me.
 These are the packages I installed:
-`base linux linux-firmware intel-ucode vim man-db man-pages texinfo`
-These are the packages I installed later that I wished I installed up front:
-`sudo vi polkit zsh htop usbutils wl-clipboard base-devel`
+`base linux linux-firmware intel-ucode vim man-db man-pages texinfo efibootmgr sudo vi polkit zsh htop usbutils wl-clipboard base-devel`
 I think it's best not to install nVidia related things at this point.
 
 ### Configure the filesystem
@@ -96,6 +94,15 @@ Like above, the `esp` on this page mapped to `/boot` for me. It pretty much work
 After that I followed the steps on the same page under sections **1.1.3 pacman hook** and **1.1.4 Building the UKIs**. After the kernel images were built, I verified by `ls /boot/EFI/Linux/` and making sure I see a `arch-linux.efi` file there.
 
 Note: At this point `mkinitcpio -P` should;ve run successfully atleast once.
+
+I skipped section **2. Signing the UKIs for Secure Boot** because I am not using secure boot, but it could be something I do in the future.
+
+Finally on this page, I went to section **3.5 Booting Directly from the UEFI**. The command I used to create a boot entry for my drive was:
+```bash
+efibootmgr --create --disk /dev/sda --part 1 --label "Arch Linux" --loader 'EFI\Linux\arch-linux-uki.efi' --unicode
+```
+(Note, the boot order automatically put the newly created boot entry as the first priority)
+
 
 ### Testing the setup
 At this point, I rebooted the system using `systemctl reboot` and checked to see if I could boot into the installed OS successfully.
