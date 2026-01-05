@@ -46,7 +46,9 @@ At this this point, the partitions where mounted, and I didn't have to do anythi
 I went back to section **2. Installation** on the [Installation Guide](https://wiki.archlinux.org/title/Installation_guide)
 The default pacman mirrors, worked and continue to work well for me.
 These are the packages I installed:
-`base linux linux-firmware intel-ucode vim man-db man-pages texinfo efibootmgr sudo vi polkit zsh htop usbutils wl-clipboard base-devel`
+```bash
+sudo pacman -S base linux linux-firmware intel-ucode vim man-db man-pages texinfo efibootmgr sudo vi polkit zsh htop usbutils wl-clipboard base-devel alsa-utils
+```
 I think it's best not to install nVidia related things at this point.
 
 ### Configure the filesystem
@@ -83,9 +85,9 @@ Back on the `luks_on_a_partition` page (yes, lots of flipping back and forth bet
 ```
 rd.luks.name=1082fcb1-9b0a-480f-86b8-fc52c135a563=root root=/dev/mapper/root
 ```
-I put my corresponding setting into `/etc/cmdline.d/unencrypt.conf` using the following command: (again, in this example /dev/sda/ was the OS drive, with sda2 being the cryto LUKS partition)
+I put my corresponding setting into `/etc/cmdline.d/50-unencrypt.conf` using the following command: (again, in this example /dev/sda/ was the OS drive, with sda2 being the cryto LUKS partition)
 ```bash
-echo "rd.luks.name=$(lsblk -dno UUID /dev/sda2)=root root=/dev/mapper/root" > /etc/cmdline.d/unencrypt.conf
+echo "rd.luks.name=$(lsblk -dno UUID /dev/sda2)=root root=/dev/mapper/root" > /etc/cmdline.d/50-unencrypt.conf
 ```
 
 Now, back on the `Unified_kernel_image` page under **1.1.2 .preset file**

@@ -4,7 +4,13 @@ Unlike the previous article, here everything happens while logged in as the prim
 ## Networking setup
 Jumping forward a bit, we go to **7. Networking** on the [General Recommendations Guide](https://wiki.archlinux.org/title/General_recommendations)
 
-I went to [Network Configuration](https://wiki.archlinux.org/title/Network_configuration).
+First I went through the setup guide for [systemd-networkd](https://wiki.archlinux.org/title/Systemd-networkd). In particular, I created a link so that networkd could manage my ethernet connection:
+```bash
+ln -s /usr/lib/systemd/network/89-ethernet.network.example /etc/systemd/network/89-ethernet.network
+```
+
+Then, I went to [Network Configuration](https://wiki.archlinux.org/title/Network_configuration).
+
 
 There are a number of recommendations here, but the only things that I had to do was enable the [systemd-networkd.service](https://wiki.archlinux.org/title/Systemd-networkd) and the [systemd-resolved.service](https://wiki.archlinux.org/title/Systemd-resolved)
 
@@ -13,7 +19,7 @@ sudo systemctl enable systemd-networkd.service
 sudo systemctl enable systemd-resolved.service
 ```
 
-In addition to "To provide domain name resolution for software that reads /etc/resolv.conf directly, such as web browsers, Go, GnuPG and QEMU when using user networking":
+In addition "To provide domain name resolution for software that reads /etc/resolv.conf directly, such as web browsers, Go, GnuPG and QEMU when using user networking", I made the following link:
 
 ```bash
 ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
@@ -37,15 +43,33 @@ Run this command that searches for the config key in `/proc/config.gz` (which ha
 zgrep CONFIG_DRM_SIMPLEDRM /proc/config.gz
 ```
 
+Then, do a reboot before going to the next section
+
 **Ensure DRM is enabled**
+
 `cat /sys/module/nvidia_drm/parameters/modeset` shoud output Y
 
-At this point to support early module loading of the nvidia modules, I modified the `etc/mkinitcpio.conf` as so:
+**Early KMS**
 
+At this point to support early module loading of the nvidia modules, I modified the `etc/mkinitcpio.conf` as so:
+1. Added the following to the modules parameter:
 ```
-MODULES=(i915 nvidia nvidia_modeset nvidia_uvm nvidia_drm)
+MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
 ```
+2. Removed `kms` from the hooks parameter
+
+After that, I added the following additional kernel parameters to optimize the boot experience:
+```bash
+sudo echo "rw loglevel=3 quiet nvidia-drm.modeset=1 nvidia_drm.fbdev=1" > /etc/cmdline.d/51-early-kms.conf
+```
+> rw - skip kernel fsck, not needed for ext4 format
+> loglevel=3 quiet - Print only errors or worse
+> nvidia-drm.modeset=1 : Tell graphics driver to take over the display immediately 
+> nvidia_drm.fbdev=1 : Provides a proper Linux framebuffer device, to help eliminate a black gap during KMS switch over.
+
 Then regenerated the initramfs using `sudo mkinitcpio -P`
+
+**Testing nVidia setup**
 
 At this point, I restarted just to ensure that the drivers were loading up right. It was also at this point that suspending and resuming the system worked stably via `sudo systemctl suspend`.
 
