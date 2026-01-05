@@ -13,4 +13,18 @@ That should enable JetBrains as the default monospace font.
 ## OMZ
 OMZ install worked perfectly from the command line!
 
-**TODO Resolve the 1-cell Nerd Font icons size**
+## Virtualbox
+I started with the [Arch VirtualBox page](https://wiki.archlinux.org/title/VirtualBox)
+
+```bash
+sudo pacman -S virtualbox virtualbox-host-modules-arch
+```
+Then to load the virtual box module manually the first time (and apparently systemd-modules-load.service will load them subsequently)
+```bash
+sudo modprobe vboxdrv
+```
+Adding myself to the vboxusers user group to use the USB devices of my host
+```bash
+sudo usermod vboxusers -aG $(whoami)
+```
+Then, I rebooted.
