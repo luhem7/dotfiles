@@ -1,3 +1,7 @@
+# Set locale variables correctly.
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -31,26 +35,17 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     git
-    zsh-autosuggestions
     rust
     sudo
     virtualenv
 )
 
-fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
-
 source $ZSH/oh-my-zsh.sh
-source ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # User configuration
 
-# You may need to manually set your language environment
-export LANG=en_US.UTF-8
-
 # Preferred editor for local and remote sessions
 export EDITOR='vim'
-
-
 
 # PROMPT MADNESS
 
@@ -113,3 +108,4 @@ local_file="$HOME/.local_config.zsh"
 if [[ -f $local_file ]]; then
     source $local_file
 fi
+
