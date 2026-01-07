@@ -147,4 +147,3 @@ We can run `speaker-test -c 2 -l 1` to play a sound through the front stereo spe
 `curl 'v2.wttr.in/Raleigh?u'`
 
 
-
