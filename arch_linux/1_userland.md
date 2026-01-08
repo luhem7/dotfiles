@@ -143,6 +143,50 @@ We can run `speaker-test -c 2 -l 1` to play a sound through the front stereo spe
 - `qpwgraph` A utility has been useful so far in ensuring I have the right sets of inputs and puts setup hooked up together.
 
 
+## System Backups
+Because I am using a full drive encryption with LUKS over a ext4 file system, I decided to use [timeshift](https://wiki.archlinux.org/title/Timeshift) for my system backup solution. However, I didn't follow the instructions on the wiki page entirely. My configuration was much simpler:
+First, I installed timeshift:
+```bash
+sudo pacman -S timeshift
+```
+Then I ran the following command to see if it could detect and mount all my drives as I wanted to store the backup on a second encrypted external drive:
+```bash
+sudo timeshift --list-devices
+```
+As part of this command, it automatically detected my second encrypted external drive. For this section, let's pretend that drive was /dev/sda/. It actually asked me for the password to unencrypt the drive. I believe that because this was the first drive it went ahead and decided that this drive would be the default snapshot device. It did some setup automatically:
+```
+First run mode (config file not found)
+Selected default snapshot type: RSYNC
+Enter passphrase for /dev/sda2: 
+
+Mounted '/dev/dm-2 (sda2)' at '/run/timeshift/130670/backup'
+Selected default snapshot device: /dev/dm-2
+
+Devices with Linux file systems:
+[...etc]
+```
+
+Anyways, instead of copying over the default config and modifying the config like it says in the wiki, I decided to go through the GUI first time setup wizard instead (this is why I did this step after setting up hyprland):
+```bash
+sudo timeshift-gtk
+```
+During the setup, I ensured that I select rsync as I have a ext4 file system.
+Now, it listed out all the devices eligible for backup, I went ahead and select /dev/sda again for device backup. I also chose to use setup 7 days of daily backups along with weekly and monthly backups.
+
+Then I created the backup through the GUI as well.
+
+I validated that the backup was created by mounting that drive and viewing the backup in the corresponding `/timeshift` directory.
+
+I also validated that the timeshift config at `/etc/timeshift/timeshift.json`
+
+I can create a timeshift (when a backup is due) by running the following command:
+```bash
+sudo timeshift --check --scripted
+```
+This command is safe to run any time as it only creates backups when they are due based on the cadence specified in the config file. If the backup drive is not encrypted, it will prompt for the password to unencrypt the drive.
+
+
+
 ## Fetch today's weather
 `curl 'v2.wttr.in/Raleigh?u'`
 
