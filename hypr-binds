@@ -1,0 +1,104 @@
+#!/usr/bin/env zsh
+#
+# hypr-binds - Display Hyprland keybindings in a readable format
+#
+# Uses hyprctl binds -j for accurate active binding information
+
+set -euo pipefail
+
+# Help
+if [[ "${1:-}" == "-h" ]] || [[ "${1:-}" == "--help" ]]; then
+    echo "Usage: hypr-binds [OPTIONS]"
+    echo ""
+    echo "Display Hyprland keybindings in a readable format."
+    echo ""
+    echo "Options:"
+    echo "  --no-color    Disable colored output"
+    echo "  -h, --help    Show this help message"
+    exit 0
+fi
+
+# Colors (disable with --no-color or when not a tty)
+if [[ -t 1 ]] && [[ "${1:-}" != "--no-color" ]]; then
+    BOLD='\033[1m'
+    DIM='\033[2m'
+    CYAN='\033[36m'
+    GREEN='\033[32m'
+    YELLOW='\033[33m'
+    RESET='\033[0m'
+else
+    BOLD='' DIM='' CYAN='' GREEN='' YELLOW='' RESET=''
+fi
+
+# Convert modmask bitmask to human-readable string
+# Bit values: 1=SHIFT, 4=CTRL, 8=ALT, 64=SUPER
+decode_modmask() {
+    local mask=$1
+    local mods=()
+
+    (( mask & 64 )) && mods+=("SUPER")
+    (( mask & 4 ))  && mods+=("CTRL")
+    (( mask & 8 ))  && mods+=("ALT")
+    (( mask & 1 ))  && mods+=("SHIFT")
+
+    if (( ${#mods[@]} == 0 )); then
+        echo ""
+    else
+        echo "${(j: + :)mods}"
+    fi
+}
+
+# Check dependencies
+if ! command -v hyprctl &>/dev/null; then
+    echo "Error: hyprctl not found. Is Hyprland running?" >&2
+    exit 1
+fi
+
+if ! command -v jq &>/dev/null; then
+    echo "Error: jq not found. Please install jq." >&2
+    exit 1
+fi
+
+# Get bindings as JSON
+bindings_json=$(hyprctl binds -j 2>/dev/null) || {
+    echo "Error: Failed to get bindings from hyprctl" >&2
+    exit 1
+}
+
+# Parse and format bindings
+echo -e "${BOLD}Hyprland Keybindings${RESET}\n"
+
+# Process each binding
+echo "$bindings_json" | jq -r '.[] | "\(.modmask)|\(.key)|\(.dispatcher)|\(.arg)|\(.mouse)"' | while IFS='|' read -r modmask key dispatcher arg is_mouse; do
+    # Decode modifier keys
+    mods=$(decode_modmask "$modmask")
+
+    # Translate mouse codes to readable names
+    case "$key" in
+        mouse:272) key="mouse_left_click" ;;
+        mouse:273) key="mouse_right_click" ;;
+        mouse:274) key="mouse_middle_click" ;;
+        mouse_up) key="m_wheel_scroll_up" ;;
+        mouse_down) key="m_wheel_scroll_down" ;;
+    esac
+
+    # Build the key combo string
+    if [[ -n "$mods" ]]; then
+        keycombo="${mods} + ${key}"
+    else
+        keycombo="${key}"
+    fi
+
+    # Format the action description
+    if [[ "$is_mouse" == "true" ]]; then
+        # For mouse bindings, arg contains the action (movewindow, resizewindow)
+        action="${arg:-$dispatcher}"
+    elif [[ -n "$arg" ]]; then
+        action="${dispatcher}: ${arg}"
+    else
+        action="${dispatcher}"
+    fi
+
+    # Print formatted line
+    printf "${CYAN}%-28s${RESET} ${DIM}→${RESET}  ${GREEN}%s${RESET}\n" "$keycombo" "$action"
+done | sort -t'+' -k1,1 -k2,2
