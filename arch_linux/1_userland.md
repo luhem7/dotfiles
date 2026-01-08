@@ -138,6 +138,10 @@ If the service fails to start use the following command to check what failed `jo
 
 We can run `speaker-test -c 2 -l 1` to play a sound through the front stereo speakers to see if the settings are working.
 
+## yay for AUR packages
+This is probably a good time to go about setting up yay so I can use it for installing and updating packages from the AUR.
+
+
 ### Useful Sound utilities
 - `wiremix` a feature rich TUI with the ability to set default sources and sinks and even do application specific routing of sources of sinks. This is like the old pavucontrol!
 - `qpwgraph` A utility has been useful so far in ensuring I have the right sets of inputs and puts setup hooked up together.
@@ -184,6 +188,8 @@ I can create a timeshift (when a backup is due) by running the following command
 sudo timeshift --check --scripted
 ```
 This command is safe to run any time as it only creates backups when they are due based on the cadence specified in the config file. If the backup drive is not encrypted, it will prompt for the password to unencrypt the drive.
+
+I even made a custom alias called `system_update` that takes care of running a timeshift backup before doing a full system upgrade using `yay`!
 
 
 
