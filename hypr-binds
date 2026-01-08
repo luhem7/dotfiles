@@ -3,6 +3,7 @@
 # hypr-binds - Display Hyprland keybindings in a readable format
 #
 # Uses hyprctl binds -j for accurate active binding information
+# Requires: nerd fonts, jq
 
 set -euo pipefail
 
@@ -25,27 +26,99 @@ if [[ -t 1 ]] && [[ "${1:-}" != "--no-color" ]]; then
     CYAN='\033[36m'
     GREEN='\033[32m'
     YELLOW='\033[33m'
+    MAGENTA='\033[35m'
+    BLUE='\033[34m'
     RESET='\033[0m'
 else
-    BOLD='' DIM='' CYAN='' GREEN='' YELLOW='' RESET=''
+    BOLD='' DIM='' CYAN='' GREEN='' YELLOW='' MAGENTA='' BLUE='' RESET=''
 fi
 
-# Convert modmask bitmask to human-readable string
-# Bit values: 1=SHIFT, 4=CTRL, 8=ALT, 64=SUPER
+# Nerd font icons (modifier keys)
+ICON_SUPER="󰖳"      # nf-md-microsoft_windows
+ICON_SHIFT="󰜷"      # nf-md-arrow_up_bold
+ICON_CTRL="󰘴"       # nf-md-apple_keyboard_control
+ICON_ALT="󰘵"        # nf-md-apple_keyboard_option
+ICON_APP=""
+ICON_TERM=""
+ICON_BROWSER="󰈹"
+ICON_FILES="󰉋"
+ICON_MENU=""
+ICON_WORKSPACE=""
+ICON_WINDOW=""
+ICON_LOCK=""
+ICON_AUDIO="󰕾"
+ICON_MIC=""
+ICON_BRIGHT="󰃠"
+ICON_MEDIA="󰎈"
+ICON_MOUSE="󰍽"
+ICON_EXIT="󰗼"
+
+# Convert modmask bitmask to icons
 decode_modmask() {
     local mask=$1
-    local mods=()
+    local mods=""
 
-    (( mask & 64 )) && mods+=("SUPER")
-    (( mask & 4 ))  && mods+=("CTRL")
-    (( mask & 8 ))  && mods+=("ALT")
-    (( mask & 1 ))  && mods+=("SHIFT")
+    (( mask & 64 )) && mods+="${ICON_SUPER} "
+    (( mask & 4 ))  && mods+="${ICON_CTRL} "
+    (( mask & 8 ))  && mods+="${ICON_ALT} "
+    (( mask & 1 ))  && mods+="${ICON_SHIFT} "
 
-    if (( ${#mods[@]} == 0 )); then
-        echo ""
-    else
-        echo "${(j: + :)mods}"
+    echo "${mods% }"
+}
+
+# Get icon for action type
+get_action_icon() {
+    local dispatcher=$1
+    local arg=$2
+
+    case "$dispatcher" in
+        exec)
+            case "$arg" in
+                *kitty*|*alacritty*|*wezterm*|*foot*|*terminal*) echo "$ICON_TERM" ;;
+                *firefox*|*chrome*|*chromium*|*brave*|*browser*) echo "$ICON_BROWSER" ;;
+                *dolphin*|*nautilus*|*thunar*|*ranger*|*files*) echo "$ICON_FILES" ;;
+                *wofi*|*rofi*|*dmenu*|*menu*) echo "$ICON_MENU" ;;
+                *lock*) echo "$ICON_LOCK" ;;
+                *wpctl*set-volume*|*pactl*|*volume*) echo "$ICON_AUDIO" ;;
+                *wpctl*set-mute*@DEFAULT_AUDIO_SOURCE@*|*mic*) echo "$ICON_MIC" ;;
+                *wpctl*set-mute*|*mute*) echo "$ICON_AUDIO" ;;
+                *brightness*|*brightnessctl*) echo "$ICON_BRIGHT" ;;
+                *playerctl*|*media*) echo "$ICON_MEDIA" ;;
+                *) echo "$ICON_APP" ;;
+            esac
+            ;;
+        workspace|movetoworkspace|togglespecialworkspace) echo "$ICON_WORKSPACE" ;;
+        killactive|togglefloating|pseudo|togglesplit|movefocus|fullscreen) echo "$ICON_WINDOW" ;;
+        mouse) echo "$ICON_MOUSE" ;;
+        exit) echo "$ICON_EXIT" ;;
+        *) echo "$ICON_WINDOW" ;;
+    esac
+}
+
+# Categorize binding
+get_category() {
+    local dispatcher=$1
+    local arg=$2
+    local key=$3
+
+    # Media keys
+    if [[ "$key" == XF86Audio* ]] || [[ "$key" == XF86MonBrightness* ]]; then
+        echo "media"
+        return
     fi
+
+    case "$dispatcher" in
+        exec)
+            case "$arg" in
+                *wpctl*|*pactl*|*brightness*|*playerctl*) echo "media" ;;
+                *) echo "apps" ;;
+            esac
+            ;;
+        workspace|movetoworkspace|togglespecialworkspace) echo "workspaces" ;;
+        mouse) echo "mouse" ;;
+        exit) echo "session" ;;
+        *) echo "windows" ;;
+    esac
 }
 
 # Check dependencies
@@ -65,22 +138,46 @@ bindings_json=$(hyprctl binds -j 2>/dev/null) || {
     exit 1
 }
 
-# Parse and format bindings
-echo -e "${BOLD}Hyprland Keybindings${RESET}\n"
+# Print section header
+print_header() {
+    local title=$1
+    local icon=$2
+    echo ""
+    echo -e "${BOLD}${MAGENTA}${icon}  ${title}${RESET}"
+    echo -e "${DIM}─────────────────────────────────────────────────${RESET}"
+}
+
+# Arrays to hold categorized bindings
+typeset -a apps_binds windows_binds workspaces_binds media_binds mouse_binds session_binds
 
 # Process each binding
-echo "$bindings_json" | jq -r '.[] | "\(.modmask)|\(.key)|\(.dispatcher)|\(.arg)|\(.mouse)"' | while IFS='|' read -r modmask key dispatcher arg is_mouse; do
+while IFS='|' read -r modmask key dispatcher arg is_mouse; do
+    # Translate keys to readable/symbolic names
+    case "$key" in
+        mouse:272) key="LMB" ;;
+        mouse:273) key="RMB" ;;
+        mouse:274) key="MMB" ;;
+        mouse_up) key="Scroll ↑" ;;
+        mouse_down) key="Scroll ↓" ;;
+        left) key="←" ;;
+        right) key="→" ;;
+        up) key="↑" ;;
+        down) key="↓" ;;
+        grave) key="\`" ;;
+        XF86AudioRaiseVolume) key="Vol ↑" ;;
+        XF86AudioLowerVolume) key="Vol ↓" ;;
+        XF86AudioMute) key="Mute" ;;
+        XF86AudioMicMute) key="Mic Mute" ;;
+        XF86MonBrightnessUp) key="Bright ↑" ;;
+        XF86MonBrightnessDown) key="Bright ↓" ;;
+        XF86AudioPlay) key="Play ⏯" ;;
+        XF86AudioPause) key="Pause ⏯" ;;
+        XF86AudioNext) key="Next ⏭" ;;
+        XF86AudioPrev) key="Prev ⏮" ;;
+    esac
+
     # Decode modifier keys
     mods=$(decode_modmask "$modmask")
-
-    # Translate mouse codes to readable names
-    case "$key" in
-        mouse:272) key="mouse_left_click" ;;
-        mouse:273) key="mouse_right_click" ;;
-        mouse:274) key="mouse_middle_click" ;;
-        mouse_up) key="m_wheel_scroll_up" ;;
-        mouse_down) key="m_wheel_scroll_down" ;;
-    esac
 
     # Build the key combo string
     if [[ -n "$mods" ]]; then
@@ -89,16 +186,111 @@ echo "$bindings_json" | jq -r '.[] | "\(.modmask)|\(.key)|\(.dispatcher)|\(.arg)
         keycombo="${key}"
     fi
 
-    # Format the action description
+    # Get action icon and format description
+    icon=$(get_action_icon "$dispatcher" "$arg")
+
     if [[ "$is_mouse" == "true" ]]; then
-        # For mouse bindings, arg contains the action (movewindow, resizewindow)
         action="${arg:-$dispatcher}"
     elif [[ -n "$arg" ]]; then
-        action="${dispatcher}: ${arg}"
+        # Clean up common args for display
+        case "$dispatcher" in
+            workspace|movetoworkspace)
+                if [[ "$arg" == "special:magic" ]]; then
+                    action="scratchpad"
+                elif [[ "$arg" == e+* ]] || [[ "$arg" == e-* ]]; then
+                    action="cycle workspaces"
+                else
+                    action="workspace $arg"
+                fi
+                ;;
+            exec)
+                # Shorten common commands
+                case "$arg" in
+                    *kitty*) action="terminal" ;;
+                    *firefox*) action="browser" ;;
+                    *dolphin*) action="file manager" ;;
+                    *wofi*) action="app launcher" ;;
+                    *hyprlock*) action="lock screen" ;;
+                    *hyprctl\ kill*) action="pick & kill window" ;;
+                    *wpctl*volume*5%+*) action="volume up" ;;
+                    *wpctl*volume*5%-*) action="volume down" ;;
+                    *wpctl*mute*SINK*) action="toggle mute" ;;
+                    *wpctl*mute*SOURCE*) action="toggle mic" ;;
+                    *brightnessctl*+*) action="brightness up" ;;
+                    *brightnessctl*-*) action="brightness down" ;;
+                    *playerctl*next*) action="next track" ;;
+                    *playerctl*prev*) action="previous track" ;;
+                    *playerctl*play-pause*) action="play/pause" ;;
+                    *) action="$arg" ;;
+                esac
+                ;;
+            movefocus)
+                case "$arg" in
+                    l) action="focus left" ;;
+                    r) action="focus right" ;;
+                    u) action="focus up" ;;
+                    d) action="focus down" ;;
+                    *) action="focus $arg" ;;
+                esac
+                ;;
+            togglespecialworkspace)
+                action="toggle scratchpad"
+                ;;
+            *) action="$arg" ;;
+        esac
     else
-        action="${dispatcher}"
+        action="$dispatcher"
     fi
 
-    # Print formatted line
-    printf "${CYAN}%-28s${RESET} ${DIM}→${RESET}  ${GREEN}%s${RESET}\n" "$keycombo" "$action"
-done | sort -t'+' -k1,1 -k2,2
+    # Format the line
+    line=$(printf "${CYAN}%-20s${RESET} ${DIM}│${RESET} %s  ${GREEN}%s${RESET}" "$keycombo" "$icon" "$action")
+
+    # Categorize
+    category=$(get_category "$dispatcher" "$arg" "$key")
+    case "$category" in
+        apps) apps_binds+=("$line") ;;
+        windows) windows_binds+=("$line") ;;
+        workspaces) workspaces_binds+=("$line") ;;
+        media) media_binds+=("$line") ;;
+        mouse) mouse_binds+=("$line") ;;
+        session) session_binds+=("$line") ;;
+    esac
+
+done < <(echo "$bindings_json" | jq -r '.[] | "\(.modmask)|\(.key)|\(.dispatcher)|\(.arg)|\(.mouse)"')
+
+# Print header
+echo ""
+echo -e "${BOLD}${BLUE}  Hyprland Keybindings${RESET}"
+
+# Print each category
+if (( ${#apps_binds[@]} > 0 )); then
+    print_header "Applications" "$ICON_APP"
+    printf '%s\n' "${apps_binds[@]}" | sort
+fi
+
+if (( ${#windows_binds[@]} > 0 )); then
+    print_header "Window Management" "$ICON_WINDOW"
+    printf '%s\n' "${windows_binds[@]}" | sort
+fi
+
+if (( ${#workspaces_binds[@]} > 0 )); then
+    print_header "Workspaces" "$ICON_WORKSPACE"
+    printf '%s\n' "${workspaces_binds[@]}" | sort
+fi
+
+if (( ${#mouse_binds[@]} > 0 )); then
+    print_header "Mouse" "$ICON_MOUSE"
+    printf '%s\n' "${mouse_binds[@]}" | sort
+fi
+
+if (( ${#media_binds[@]} > 0 )); then
+    print_header "Media & Hardware" "$ICON_MEDIA"
+    printf '%s\n' "${media_binds[@]}" | sort
+fi
+
+if (( ${#session_binds[@]} > 0 )); then
+    print_header "Session" "$ICON_EXIT"
+    printf '%s\n' "${session_binds[@]}" | sort
+fi
+
+echo ""
