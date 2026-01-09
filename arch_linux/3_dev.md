@@ -42,3 +42,11 @@ I did not install the arch linux nodejs and npm packages. I just installed and u
 sudo pacman -S nvm
 ```
 Then it just worked right off the bat.
+
+## Installing nvim
+```bash
+pacman -S nvim
+```
+Then, I followed the instructions [here](https://lazy.folke.io/installation) to install the `lazy.vim plugin manager.
+
+
