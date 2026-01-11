@@ -53,4 +53,11 @@ pacman -S nvim
 ```
 Then, I followed the instructions [here](https://lazy.folke.io/installation) to install the `lazy.vim plugin manager.
 
+## Useful packages
 
+### lsd
+A modern replacement for `ls` with colors and icons.
+```bash
+sudo pacman -S lsd
+```
+The `.zsh_linux.zsh` config will automatically alias `ls` to `lsd` if installed.

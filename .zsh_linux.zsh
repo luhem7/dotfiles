@@ -1,9 +1,8 @@
 #! /bin/zsh
 
 # Alias ls to lsd if lsd is installed.
-lsd_install_path=~/.cargo/bin/lsd
-if [ -f "$lsd_install_path" ]; then
-    alias ls="$lsd_install_path"
+if command -v lsd &> /dev/null; then
+    alias ls=lsd
 fi
 
 # Source locally installed applications
