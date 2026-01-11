@@ -2,53 +2,58 @@
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
-
-# Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
-
-ZSH_THEME=()
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-HYPHEN_INSENSITIVE="true"
-
-zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-zstyle ':omz:update' frequency 13
-
-# Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION="true"
-
-COMPLETION_WAITING_DOTS="true"
-
-DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(
-    git
-    rust
-    sudo
-    virtualenv
-)
-
-source $ZSH/oh-my-zsh.sh
-
-# User configuration
-
-# Preferred editor for local and remote sessions
+# Preferred editor
 export EDITOR='vim'
 
-# PROMPT MADNESS
+# ---------------------
+# Completion System
+# ---------------------
+autoload -Uz compinit
+compinit
 
+# Case-insensitive and hyphen-insensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|=*' 'l:|=* r:|=*'
+
+# Completion menu with selection
+zstyle ':completion:*' menu select
+
+# Cache completions for faster loading
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
+
+# ---------------------
+# Zsh Options
+# ---------------------
+setopt correct              # Command auto-correction
+setopt PROMPT_SUBST         # Allow substitution in prompt
+
+# ---------------------
+# History
+# ---------------------
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+
+setopt SHARE_HISTORY          # Share history between all sessions
+setopt HIST_IGNORE_DUPS       # Don't record duplicate entries
+setopt HIST_IGNORE_ALL_DUPS   # Remove older duplicate when adding new
+setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
+setopt HIST_REDUCE_BLANKS     # Remove unnecessary blanks
+setopt HIST_VERIFY            # Show command before executing from history
+setopt INC_APPEND_HISTORY     # Add commands immediately, not at shell exit
+
+# ---------------------
+# Plugins (Arch packages)
+# ---------------------
+# Install: sudo pacman -S zsh-syntax-highlighting zsh-autosuggestions
+[[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && \
+    source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && \
+    source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# ---------------------
+# Prompt
+# ---------------------
 [[ $COLORTERM = *(24bit|truecolor)* ]] || zmodload zsh/nearcolor
 
 autoload -Uz vcs_info
@@ -58,14 +63,12 @@ precmd() {
 zstyle ':vcs_info:git:*' formats $' \uf418 %b'
 
 display_py_env() {
-    if [[ -n "$(virtualenv_prompt_info)" ]]; then
+    if [[ -n "$VIRTUAL_ENV" ]]; then
         echo " %F{yellow}\ue235 %f"
     else
         echo ""
     fi
 }
-
-setopt PROMPT_SUBST
 
 PROMPT=\
 '['\
@@ -80,6 +83,7 @@ $']'
 # Other env settings
 alias python=python3
 alias pyactivate="source .venv/bin/activate"
+alias gitc="git commit -m"
 alias gitca="git commit --amend --reuse-message=HEAD"
 alias gitfp='git push --force-with-lease'
 alias gitcpc='sh ~/commit-push-changes.sh'

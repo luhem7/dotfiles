@@ -10,8 +10,12 @@ fc-cache -rv
 ``` 
 That should enable JetBrains as the default monospace font.
 
-## OMZ
-OMZ install worked perfectly from the command line!
+## Zsh plugins
+Install syntax highlighting and autosuggestions for a better shell experience:
+```bash
+sudo pacman -S zsh-syntax-highlighting zsh-autosuggestions
+```
+The `.zshrc` in this repo will automatically source these if installed.
 
 ## Configuring Kitty
 Kitty was installed earlier. We just need to copy over the config files and restart kitty.
