@@ -197,4 +197,3 @@ I even made a custom alias called `system_update` that takes care of running a t
 ## Fetch today's weather
 `curl 'v2.wttr.in/Raleigh?u'`
 
-

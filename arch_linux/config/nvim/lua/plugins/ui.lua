@@ -4,4 +4,8 @@ return {
     event = "VeryLazy",
     opts = {},
   },
+  {
+    "nvim-tree/nvim-web-devicons",
+    lazy = true,
+  },
 }
