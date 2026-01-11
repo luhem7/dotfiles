@@ -61,3 +61,47 @@ A modern replacement for `ls` with colors and icons.
 sudo pacman -S lsd
 ```
 The `.zsh_linux.zsh` config will automatically alias `ls` to `lsd` if installed.
+
+### bat
+A `cat` replacement with syntax highlighting and line numbers.
+```bash
+sudo pacman -S bat
+```
+
+### ripgrep
+A faster `grep` replacement with sane defaults, respects .gitignore.
+```bash
+sudo pacman -S ripgrep
+```
+Use with `rg <pattern>`.
+
+### fzf
+Fuzzy finder for files, command history, and more.
+```bash
+sudo pacman -S fzf
+```
+Press `Ctrl+R` for fuzzy history search.
+
+### btop
+Beautiful terminal-based process/resource monitor.
+```bash
+sudo pacman -S btop
+```
+
+### dust
+A more intuitive `du` replacement with visual directory tree.
+```bash
+sudo pacman -S dust
+```
+
+### procs
+A modern `ps` replacement with color output and search.
+```bash
+sudo pacman -S procs
+```
+
+### yazi
+Fast terminal file manager with image preview support.
+```bash
+sudo pacman -S yazi
+```
