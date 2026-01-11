@@ -106,7 +106,7 @@ But really, this is already present in the included hyprland config in this repo
 Along with installing Hyprland I had to install the following mandatory and highly recommended packages:
 
 ```bash
-sudo pacman -S pipewire wireplumber wiremix hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent kitty dolphin wofi firefox qt5-wayland qt6-wayland noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono-nerd
+sudo pacman -S pipewire wireplumber wiremix hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent ghostty dolphin wofi firefox qt5-wayland qt6-wayland noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono-nerd
 ```
 
 After this, I also followed the installation guide on [their official website](https://wiki.hypr.land/Getting-Started/Master-Tutorial/)
@@ -143,6 +143,7 @@ This is probably a good time to go about setting up yay so I can use it for inst
 
 
 ### Useful Sound utilities
+- `pipewire-pulse` Some games / applications might expect to still talk to pulseaudio, so this compatibility layer sets that up for them.
 - `wiremix` a feature rich TUI with the ability to set default sources and sinks and even do application specific routing of sources of sinks. This is like the old pavucontrol!
 - `qpwgraph` A utility has been useful so far in ensuring I have the right sets of inputs and puts setup hooked up together.
 
