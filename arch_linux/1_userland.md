@@ -1,5 +1,4 @@
-# Userland setup
-Unlike the previous article, here everything happens while logged in as the primary user (and not root)
+# Userland setup Unlike the previous article, here everything happens while logged in as the primary user (and not root)
 
 ## Networking setup
 Jumping forward a bit, we go to **7. Networking** on the [General Recommendations Guide](https://wiki.archlinux.org/title/General_recommendations)
@@ -106,7 +105,7 @@ But really, this is already present in the included hyprland config in this repo
 Along with installing Hyprland I had to install the following mandatory and highly recommended packages:
 
 ```bash
-sudo pacman -S pipewire wireplumber wiremix hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent ghostty dolphin wofi firefox qt5-wayland qt6-wayland noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono-nerd
+sudo pacman -S pipewire wireplumber wiremix hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent ghostty dolphin wofi firefox qt5-wayland qt6-wayland noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono-nerd dunst lib-notify
 ```
 
 After this, I also followed the installation guide on [their official website](https://wiki.hypr.land/Getting-Started/Master-Tutorial/)
