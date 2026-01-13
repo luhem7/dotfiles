@@ -17,3 +17,6 @@ I installed AGS via yay:
 ```bash
 yay -S aylurs-gtk-shell
 ```
+
+### AGS Bar Configuration
+The AGS bar configuration lives in `~/.config/ags/` with the following structure:
