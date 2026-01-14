@@ -10,7 +10,7 @@ window.Bar {
 
   > centerbox {
     background: transparent;
-    margin: 0 8px;
+    margin: 4px 8px 0px 8px;
   }
 
   button {
@@ -19,10 +19,21 @@ window.Bar {
   }
 
   menubutton.clock > button {
-    background: #1D2021;
+    background: #B8C63F;
+    border-radius: 0;
+    padding: 0 8px;
+    margin: 0;
+    min-height: 0;
+    min-width: 0;
   }
 
   .clock label {
+    color: #1D2021
+  }
+
+  .chevron{
     color: #B8C63F;
+    margin: 0;
+    font-size: 1.0em;
   }
 }
