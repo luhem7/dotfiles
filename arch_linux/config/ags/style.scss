@@ -1,39 +1,59 @@
-// https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
-$fg-color: #{"@theme_fg_color"};
-$bg-color: #{"@theme_bg_color"};
+// Custom colors
+$dark-bg: #1D2021;
+$off-focus: #433F3C;
+$accent-green: #B8C63F;
+$accent-orange: #E0944F;
+$accent-blue: #427F82;
 
 window.Bar {
   background: transparent;
-  color: $fg-color;
   font-family: "JetBrainsMono Nerd Font", monospace;
   font-weight: bold;
 
   > centerbox {
     background: transparent;
-    margin: 4px 8px 0px 8px;
+    margin: 0 6px;
   }
 
-  button {
-    border-radius: 8px;
-    margin: 2px;
+  // Endbox container
+  #endbox {
+    background: $dark-bg;
+    color: $dark-bg;
+    border: 2px solid $off-focus;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
   }
 
-  menubutton.clock > button {
-    background: #B8C63F;
+  // Clock widget
+  .clock {
+    margin: 0 0 6px 0;
+    background: transparent;
+    border: none;
     border-radius: 0;
-    padding: 0 8px;
-    margin: 0;
-    min-height: 0;
-    min-width: 0;
-  }
 
-  .clock label {
-    color: #1D2021
-  }
+    > button {
+      padding: 0 8px;
+      margin: 0;
+      min-height: 0;
+      min-width: 0;
+    }
 
-  .chevron{
-    color: #B8C63F;
-    margin: 0;
-    font-size: 1.0em;
+    .time {
+      padding: 0 8px;
+      background: $accent-green;
+      color: $dark-bg;
+    }
+
+    .chevron {
+      color: $accent-green;
+      background: $dark-bg;
+      margin: 0;
+      font-size: 1.0em;
+    }
+
+    #chevron-right {
+      color: $dark-bg;
+      background: $accent-green;
+    }
   }
 }
