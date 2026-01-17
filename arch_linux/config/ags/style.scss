@@ -1,7 +1,7 @@
 // Custom colors
 $dark-bg: #1D2021;
 $off-focus: #433F3C;
-$accent-green: #B8C63F;
+$accent-green: #689D6A;
 $accent-orange: #E0944F;
 $accent-blue: #427F82;
 
@@ -13,6 +13,45 @@ window.Bar {
   > centerbox {
     background: transparent;
     margin: 0 6px;
+  }
+
+  // Startbox container
+  #startbox {
+    background: $dark-bg;
+    color: $dark-bg;
+    border: 2px solid $off-focus;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    transition-property: border-color;
+    transition-duration: 300ms;
+    transition-timing-function: ease;
+
+    &:hover {
+      border-color: $accent-orange;
+    }
+
+    > box {
+      margin: 0 0 6px 0;
+      padding: 0 8px;
+    }
+
+    .userhost {
+      padding: 0 8px;
+      background: $accent-blue;
+      color: $dark-bg;
+    }
+
+    .chevron {
+      color: $dark-bg;
+      background: $accent-blue;
+      margin: 0;
+      font-size: 1.0em;
+    }
+
+    #chevron-right {
+      color: $accent-blue;
+      background: $dark-bg;
+    }
   }
 
   // Endbox container
