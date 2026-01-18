@@ -3,13 +3,17 @@ import { Astal, Gtk, Gdk } from "ags/gtk4"
 import { createPoll } from "ags/time"
 import GLib from "gi://GLib"
 import Hyprland from "gi://AstalHyprland"
+import { getSunTimes, getHourBrightness, brightnessToColor } from "../sun"
 
 const LEFT_TRIANGLE = "" // Ctrl+v u e0b2
 const RIGHT_TRIANGLE = "" // Ctrl+v u e0b0
 const TITLE_MAX_LENGTH = 30
 const HOUR_SEGMENTS = 24
 
-// Singleton instances
+const HIGHLIGHT_COLOR = "#EBDBB2"
+const YELLOW_ACCENT = "#D79921"
+const BASE_COLOR = "#433F3C"
+
 const hyprland = Hyprland.get_default()
 
 function getWorkspaces() {
@@ -53,7 +57,6 @@ function initWorkspaces(container: Gtk.Box) {
 		const workspaces = getWorkspaces()
 		const currentIds = new Set(workspaces.map(ws => ws.id))
 
-		// Remove stale buttons
 		buttons.forEach((btn, id) => {
 			if (!currentIds.has(id)) {
 				container.remove(btn)
@@ -61,7 +64,6 @@ function initWorkspaces(container: Gtk.Box) {
 			}
 		})
 
-		// Clear and rebuild in order
 		while (container.get_first_child()) {
 			container.remove(container.get_first_child()!)
 		}
@@ -74,11 +76,9 @@ function initWorkspaces(container: Gtk.Box) {
 		updateFocus()
 	}
 
-	// Initial build without animation
 	getWorkspaces().forEach(ws => container.append(createButton(ws, false)))
 	updateFocus()
 
-	// Connect signals
 	hyprland.connect("notify::workspaces", sync)
 	hyprland.connect("notify::focused-workspace", updateFocus)
 }
@@ -94,6 +94,34 @@ function initWindowTitle(label: Gtk.Label) {
 
 function initHourSegments(container: Gtk.Box, hourPoll: ReturnType<typeof createPoll<number>>) {
 	const segments: Gtk.Box[] = []
+	const providers: Gtk.CssProvider[] = []
+	let sunTimes = getSunTimes()
+	let segmentColors: string[] = []
+
+	const calculateColors = () => {
+		segmentColors = []
+		for (let i = 0; i < HOUR_SEGMENTS; i++) {
+			const brightness = getHourBrightness(i, sunTimes)
+			const isDaytime = i >= sunTimes.sunrise && i < sunTimes.sunset
+
+			if (isDaytime) {
+				segmentColors.push(brightnessToColor(brightness, BASE_COLOR, 20, YELLOW_ACCENT, 0.3))
+			} else {
+				segmentColors.push(brightnessToColor(brightness, BASE_COLOR, 10))
+			}
+		}
+	}
+
+	const applyColor = (index: number, color: string) => {
+		const segment = segments[index]
+		if (providers[index]) {
+			segment.get_style_context().remove_provider(providers[index])
+		}
+		const provider = new Gtk.CssProvider()
+		provider.load_from_string(`* { background: ${color}; }`)
+		segment.get_style_context().add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+		providers[index] = provider
+	}
 
 	for (let i = 0; i < HOUR_SEGMENTS; i++) {
 		const segment = new Gtk.Box()
@@ -103,12 +131,28 @@ function initHourSegments(container: Gtk.Box, hourPoll: ReturnType<typeof create
 		container.append(segment)
 	}
 
+	calculateColors()
+
+	let prevHour = -1
+
 	const update = () => {
 		const currentHour = hourPoll.get()
-		segments.forEach((seg, i) => {
-			seg[i === currentHour ? "add_css_class" : "remove_css_class"]("active")
-		})
+		if (currentHour === prevHour) return
+
+		if (currentHour === 0) {
+			sunTimes = getSunTimes()
+			calculateColors()
+		}
+
+		if (prevHour >= 0) {
+			applyColor(prevHour, segmentColors[prevHour])
+		}
+		applyColor(currentHour, HIGHLIGHT_COLOR)
+
+		prevHour = currentHour
 	}
+
+	segments.forEach((_, i) => applyColor(i, segmentColors[i]))
 
 	update()
 	hourPoll.subscribe(update)
@@ -144,7 +188,6 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 					</box>
 				</box>
 
-				{/* Center: empty */}
 				<box $type="center" />
 
 				<box name="endbox" $type="end" hexpand halign={Gtk.Align.END}>
