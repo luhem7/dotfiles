@@ -42,10 +42,23 @@ window.Bar {
       color: $dark-bg;
     }
 
+    .workspaces {
+      background: $accent-yellow;
+    }
+
     .workspace {
-      padding: 0 8px;
+      padding: 0 4px;
+      margin: 0;
+      min-height: 0;
+      min-width: 0;
       background: $accent-yellow;
       color: $dark-bg;
+      border: none;
+      border-radius: 0;
+
+      &.active label {
+        text-decoration: underline;
+      }
     }
 
     // Opening chevron: dark arrow on blue

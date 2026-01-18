@@ -32,9 +32,32 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 						<label name="chevron-open" valign={Gtk.Align.CENTER} label={right_triangle} />
 						<label class="userhost" label={userhost} />
 						<label name="chevron-mid" valign={Gtk.Align.CENTER} label={right_triangle} />
-						<label
-							class="workspace"
-							label={createBinding(hyprland, "focusedWorkspace").as(ws => ws ? `${ws.id}` : "")}
+						<box
+							class="workspaces"
+							onRealize={(self) => {
+								const updateWorkspaces = () => {
+									// Remove old children
+									while (self.get_first_child())
+										self.remove(self.get_first_child()!)
+									// Add new children using Gtk directly (avoids tracking context errors)
+									const focusedId = hyprland.get_focused_workspace()?.id
+									hyprland.get_workspaces()
+										.filter(ws => ws.id > 0)
+										.sort((a, b) => a.id - b.id)
+										.forEach(ws => {
+											const btn = new Gtk.Button()
+											const label = new Gtk.Label({ label: `${ws.id}` })
+											btn.set_child(label)
+											btn.add_css_class("workspace")
+											if (ws.id === focusedId) btn.add_css_class("active")
+											btn.connect("clicked", () => ws.focus())
+											self.append(btn)
+										})
+								}
+								updateWorkspaces()
+								hyprland.connect("notify::workspaces", updateWorkspaces)
+								hyprland.connect("notify::focused-workspace", updateWorkspaces)
+							}}
 						/>
 						<label name="chevron-right" valign={Gtk.Align.CENTER} label={right_triangle} />
 					</box>
