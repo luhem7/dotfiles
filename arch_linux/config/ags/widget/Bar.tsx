@@ -37,27 +37,53 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 							onRealize={(self) => {
 								const buttons = new Map<number, Gtk.Button>()
 
-								const rebuildButtons = () => {
-									// Remove old children
-									while (self.get_first_child())
-										self.remove(self.get_first_child()!)
-									buttons.clear()
+								const createButton = (ws: Hyprland.Workspace, animate: boolean) => {
+									const btn = new Gtk.Button()
+									const label = new Gtk.Label({ label: `${ws.id}` })
+									btn.set_child(label)
+									btn.add_css_class("workspace")
+									if (animate) btn.add_css_class("entering")
+									btn.connect("clicked", () => ws.focus())
+									buttons.set(ws.id, btn)
+									if (animate) {
+										GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
+											btn.remove_css_class("entering")
+											return GLib.SOURCE_REMOVE
+										})
+									}
+									return btn
+								}
 
-									// Add new children
-									const focusedId = hyprland.get_focused_workspace()?.id
-									hyprland.get_workspaces()
+								const syncWorkspaces = () => {
+									const workspaces = hyprland.get_workspaces()
 										.filter(ws => ws.id > 0)
 										.sort((a, b) => a.id - b.id)
-										.forEach(ws => {
-											const btn = new Gtk.Button()
-											const label = new Gtk.Label({ label: `${ws.id}` })
-											btn.set_child(label)
-											btn.add_css_class("workspace")
-											if (ws.id === focusedId) btn.add_css_class("active")
-											btn.connect("clicked", () => ws.focus())
-											self.append(btn)
-											buttons.set(ws.id, btn)
-										})
+									const currentIds = new Set(workspaces.map(ws => ws.id))
+									const existingIds = new Set(buttons.keys())
+
+									// Remove buttons for workspaces that no longer exist
+									existingIds.forEach(id => {
+										if (!currentIds.has(id)) {
+											const btn = buttons.get(id)
+											if (btn) self.remove(btn)
+											buttons.delete(id)
+										}
+									})
+
+									// Rebuild the box in correct order, creating new buttons as needed
+									while (self.get_first_child())
+										self.remove(self.get_first_child()!)
+
+									workspaces.forEach(ws => {
+										const isNew = !existingIds.has(ws.id)
+										let btn = buttons.get(ws.id)
+										if (!btn) {
+											btn = createButton(ws, true)
+										}
+										self.append(btn)
+									})
+
+									updateFocus()
 								}
 
 								const updateFocus = () => {
@@ -71,8 +97,17 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 									})
 								}
 
-								rebuildButtons()
-								hyprland.connect("notify::workspaces", rebuildButtons)
+								// Initial build (no animation)
+								hyprland.get_workspaces()
+									.filter(ws => ws.id > 0)
+									.sort((a, b) => a.id - b.id)
+									.forEach(ws => {
+										const btn = createButton(ws, false)
+										self.append(btn)
+									})
+								updateFocus()
+
+								hyprland.connect("notify::workspaces", syncWorkspaces)
 								hyprland.connect("notify::focused-workspace", updateFocus)
 							}}
 						/>
