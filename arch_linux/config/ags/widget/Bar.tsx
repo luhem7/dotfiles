@@ -112,6 +112,20 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 								hyprland.connect("notify::focused-workspace", updateFocus)
 							}}
 						/>
+						<label name="chevron-yellow-red" valign={Gtk.Align.CENTER} label={right_triangle} />
+						<label
+							class="window-title"
+							onRealize={(self) => {
+								const updateTitle = () => {
+									const client = hyprland.get_focused_client()
+									const title = client?.get_title() || "Desktop"
+									// Truncate long titles
+									self.set_label(title.length > 30 ? title.slice(0, 30) + "…" : title)
+								}
+								updateTitle()
+								hyprland.connect("notify::focused-client", updateTitle)
+							}}
+						/>
 						<label name="chevron-right" valign={Gtk.Align.CENTER} label={right_triangle} />
 					</box>
 				</box>

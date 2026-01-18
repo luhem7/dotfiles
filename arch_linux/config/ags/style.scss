@@ -5,6 +5,7 @@ $accent-green: #689D6A;
 $accent-orange: #E0944F;
 $accent-blue: #427F82;
 $accent-yellow: #D79921;
+$accent-red: #EA6926;
 $highlight: #EBDBB2;
 
 window.Bar {
@@ -85,9 +86,23 @@ window.Bar {
       font-size: 1.0em;
     }
 
-    // Closing chevron: yellow arrow on dark
-    #chevron-right {
+    // Yellow to red chevron
+    #chevron-yellow-red {
       color: $accent-yellow;
+      background: $accent-red;
+      margin: 0;
+      font-size: 1.0em;
+    }
+
+    .window-title {
+      padding: 0 8px;
+      background: $accent-red;
+      color: $dark-bg;
+    }
+
+    // Closing chevron: red arrow on dark
+    #chevron-right {
+      color: $accent-red;
       background: $dark-bg;
       margin: 0;
       font-size: 1.0em;
