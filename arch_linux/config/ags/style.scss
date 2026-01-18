@@ -1,13 +1,50 @@
-// Custom colors
+// =============================================================================
+// Color Palette (Gruvbox-inspired)
+// =============================================================================
 $dark-bg: #1D2021;
 $off-focus: #433F3C;
-$accent-green: #689D6A;
-$accent-orange: #E0944F;
+$highlight: #EBDBB2;
+
 $accent-blue: #427F82;
 $accent-yellow: #D79921;
 $accent-red: #EA6926;
-$highlight: #EBDBB2;
+$accent-green: #689D6A;
+$accent-orange: #E0944F;
 
+// =============================================================================
+// Mixins
+// =============================================================================
+
+// Shared container styles for startbox/endbox
+@mixin panel-container {
+  background: $dark-bg;
+  color: $dark-bg;
+  border: 2px solid $off-focus;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  transition: border-color 300ms ease;
+
+  &:hover {
+    border-color: $accent-orange;
+  }
+}
+
+// Base chevron/triangle styles
+@mixin chevron-base {
+  margin: 0;
+  font-size: 1em;
+}
+
+// Powerline segment with accent background
+@mixin powerline-segment($bg-color) {
+  padding: 0 8px;
+  background: $bg-color;
+  color: $dark-bg;
+}
+
+// =============================================================================
+// Bar Window
+// =============================================================================
 window.Bar {
   background: transparent;
   font-family: "JetBrainsMono Nerd Font", monospace;
@@ -18,36 +55,23 @@ window.Bar {
     margin: 0 6px;
   }
 
-  // Startbox container
+  // ===========================================================================
+  // Left Panel (startbox)
+  // ===========================================================================
   #startbox {
-    background: $dark-bg;
-    color: $dark-bg;
-    border: 2px solid $off-focus;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    transition-property: border-color;
-    transition-duration: 300ms;
-    transition-timing-function: ease;
-
-    &:hover {
-      border-color: $accent-orange;
-    }
+    @include panel-container;
 
     > box {
       margin: 0 0 6px 0;
       padding: 0 8px;
     }
 
-    .userhost {
-      padding: 0 8px;
-      background: $accent-blue;
-      color: $dark-bg;
-    }
+    // Powerline segments
+    .userhost { @include powerline-segment($accent-blue); }
+    .workspaces { background: $accent-yellow; }
+    .window-title { @include powerline-segment($accent-red); }
 
-    .workspaces {
-      background: $accent-yellow;
-    }
-
+    // Workspace buttons
     .workspace {
       padding: 0 4px;
       margin: 0;
@@ -70,62 +94,42 @@ window.Bar {
       }
     }
 
-    // Opening chevron: dark arrow on blue
+    // Chevrons (powerline transitions)
     #chevron-open {
+      @include chevron-base;
       color: $dark-bg;
       background: $accent-blue;
-      margin: 0;
-      font-size: 1.0em;
     }
 
-    // Middle chevron: blue arrow on yellow (transition)
     #chevron-mid {
+      @include chevron-base;
       color: $accent-blue;
       background: $accent-yellow;
-      margin: 0;
-      font-size: 1.0em;
     }
 
-    // Yellow to red chevron
     #chevron-yellow-red {
+      @include chevron-base;
       color: $accent-yellow;
       background: $accent-red;
-      margin: 0;
-      font-size: 1.0em;
     }
 
-    .window-title {
-      padding: 0 8px;
-      background: $accent-red;
-      color: $dark-bg;
-    }
-
-    // Closing chevron: red arrow on dark
     #chevron-right {
+      @include chevron-base;
       color: $accent-red;
       background: $dark-bg;
-      margin: 0;
-      font-size: 1.0em;
     }
   }
 
-  // Endbox container
+  // ===========================================================================
+  // Right Panel (endbox)
+  // ===========================================================================
   #endbox {
-    background: $dark-bg;
-    color: $dark-bg;
-    border: 2px solid $off-focus;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    transition-property: border-color;
-    transition-duration: 300ms;
-    transition-timing-function: ease;
-
-    &:hover {
-      border-color: $accent-orange;
-    }
+    @include panel-container;
   }
 
-  // Clock widget
+  // ===========================================================================
+  // Clock Widget
+  // ===========================================================================
   .clock {
     margin: 0;
     background: transparent;
@@ -140,23 +144,21 @@ window.Bar {
     }
 
     .time {
-      padding: 0 8px;
-      background: $accent-green;
-      color: $dark-bg;
+      @include powerline-segment($accent-green);
     }
 
     .chevron {
+      @include chevron-base;
       color: $accent-green;
       background: $dark-bg;
-      margin: 0;
-      font-size: 1.0em;
+
+      &#chevron-right {
+        color: $dark-bg;
+        background: $accent-green;
+      }
     }
 
-    #chevron-right {
-      color: $dark-bg;
-      background: $accent-green;
-    }
-
+    // Hour indicator bar
     .hour-segments {
       margin: 0 0 2px 10px;
 
