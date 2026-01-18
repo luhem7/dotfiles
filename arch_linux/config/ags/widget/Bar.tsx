@@ -8,6 +8,7 @@ import Hyprland from "gi://AstalHyprland"
 
 export default function Bar(gdkmonitor: Gdk.Monitor) {
 	const time = createPoll("", 1000, "date '+%A %Y-%m-%d %I:%M:%S %p'")
+	const hour = createPoll(new Date().getHours(), 60000, () => new Date().getHours())
 	const userhost = `${GLib.get_user_name()}@${GLib.get_host_name()}`
 	const left_triangle = ""
 	const right_triangle = ""
@@ -125,10 +126,42 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 				<box $type="center" />
 				<box name="endbox" $type="end" hexpand halign={Gtk.Align.END}>
 					<menubutton class="clock">
-						<box>
-							<label class="chevron" valign={Gtk.Align.CENTER} label={left_triangle}/>
-							<label class="time" label={time} />
-							<label class="chevron" name="chevron-right" valign={Gtk.Align.CENTER} label={left_triangle} />
+						<box orientation={Gtk.Orientation.VERTICAL}>
+							<box>
+								<label class="chevron" valign={Gtk.Align.CENTER} label={left_triangle}/>
+								<label class="time" label={time} />
+								<label class="chevron" name="chevron-right" valign={Gtk.Align.CENTER} label={left_triangle} />
+							</box>
+							<box
+								class="hour-segments"
+								onRealize={(self) => {
+									const segments: Gtk.Box[] = []
+
+									// Create 24 hour segments
+									for (let i = 0; i < 24; i++) {
+										const segment = new Gtk.Box()
+										segment.add_css_class("hour-segment")
+										segment.set_hexpand(true)
+										segments.push(segment)
+										self.append(segment)
+									}
+
+									// Update active segment based on current hour
+									const updateHour = () => {
+										const currentHour = hour.get()
+										segments.forEach((seg, i) => {
+											if (i === currentHour) {
+												seg.add_css_class("active")
+											} else {
+												seg.remove_css_class("active")
+											}
+										})
+									}
+
+									updateHour()
+									hour.subscribe(updateHour)
+								}}
+							/>
 						</box>
 						<popover>
 							<Gtk.Calendar />
