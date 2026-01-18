@@ -35,11 +35,15 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 						<box
 							class="workspaces"
 							onRealize={(self) => {
-								const updateWorkspaces = () => {
+								const buttons = new Map<number, Gtk.Button>()
+
+								const rebuildButtons = () => {
 									// Remove old children
 									while (self.get_first_child())
 										self.remove(self.get_first_child()!)
-									// Add new children using Gtk directly (avoids tracking context errors)
+									buttons.clear()
+
+									// Add new children
 									const focusedId = hyprland.get_focused_workspace()?.id
 									hyprland.get_workspaces()
 										.filter(ws => ws.id > 0)
@@ -52,11 +56,24 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 											if (ws.id === focusedId) btn.add_css_class("active")
 											btn.connect("clicked", () => ws.focus())
 											self.append(btn)
+											buttons.set(ws.id, btn)
 										})
 								}
-								updateWorkspaces()
-								hyprland.connect("notify::workspaces", updateWorkspaces)
-								hyprland.connect("notify::focused-workspace", updateWorkspaces)
+
+								const updateFocus = () => {
+									const focusedId = hyprland.get_focused_workspace()?.id
+									buttons.forEach((btn, id) => {
+										if (id === focusedId) {
+											btn.add_css_class("active")
+										} else {
+											btn.remove_css_class("active")
+										}
+									})
+								}
+
+								rebuildButtons()
+								hyprland.connect("notify::workspaces", rebuildButtons)
+								hyprland.connect("notify::focused-workspace", updateFocus)
 							}}
 						/>
 						<label name="chevron-right" valign={Gtk.Align.CENTER} label={right_triangle} />
