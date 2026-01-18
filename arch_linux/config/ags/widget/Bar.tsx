@@ -1,14 +1,18 @@
 import app from "ags/gtk4/app"
 import { Astal, Gtk, Gdk } from "ags/gtk4"
+import { createBinding } from "ags"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 import GLib from "gi://GLib"
+import Hyprland from "gi://AstalHyprland"
 
 export default function Bar(gdkmonitor: Gdk.Monitor) {
 	const time = createPoll("", 1000, "date '+%A %Y-%m-%d %I:%M:%S %p'")
 	const userhost = `${GLib.get_user_name()}@${GLib.get_host_name()}`
 	const left_triangle = ""
 	const right_triangle = ""
+
+	const hyprland = Hyprland.get_default()
 
 	const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
 
@@ -25,9 +29,14 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 			<centerbox cssName="centerbox">
 				<box name="startbox" $type="start" hexpand halign={Gtk.Align.START}>
 					<box>
-						<label class="chevron" valign={Gtk.Align.CENTER} label={right_triangle} />
+						<label name="chevron-open" valign={Gtk.Align.CENTER} label={right_triangle} />
 						<label class="userhost" label={userhost} />
-						<label class="chevron" name="chevron-right" valign={Gtk.Align.CENTER} label={right_triangle} />
+						<label name="chevron-mid" valign={Gtk.Align.CENTER} label={right_triangle} />
+						<label
+							class="workspace"
+							label={createBinding(hyprland, "focusedWorkspace").as(ws => ws ? `${ws.id}` : "")}
+						/>
+						<label name="chevron-right" valign={Gtk.Align.CENTER} label={right_triangle} />
 					</box>
 				</box>
 				{/* <button

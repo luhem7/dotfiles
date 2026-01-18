@@ -4,6 +4,7 @@ $off-focus: #433F3C;
 $accent-green: #689D6A;
 $accent-orange: #E0944F;
 $accent-blue: #427F82;
+$accent-yellow: #D79921;
 
 window.Bar {
   background: transparent;
@@ -41,16 +42,34 @@ window.Bar {
       color: $dark-bg;
     }
 
-    .chevron {
+    .workspace {
+      padding: 0 8px;
+      background: $accent-yellow;
+      color: $dark-bg;
+    }
+
+    // Opening chevron: dark arrow on blue
+    #chevron-open {
       color: $dark-bg;
       background: $accent-blue;
       margin: 0;
       font-size: 1.0em;
     }
 
-    #chevron-right {
+    // Middle chevron: blue arrow on yellow (transition)
+    #chevron-mid {
       color: $accent-blue;
+      background: $accent-yellow;
+      margin: 0;
+      font-size: 1.0em;
+    }
+
+    // Closing chevron: yellow arrow on dark
+    #chevron-right {
+      color: $accent-yellow;
       background: $dark-bg;
+      margin: 0;
+      font-size: 1.0em;
     }
   }
 
