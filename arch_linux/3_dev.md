@@ -105,3 +105,9 @@ Fast terminal file manager with image preview support.
 ```bash
 sudo pacman -S yazi
 ```
+
+#### yazi plugins
+I installed a plugin to maximize / minimize the preview window pane
+```bash
+ya pkg add yazi-rs/plugins:toggle-pane
+```

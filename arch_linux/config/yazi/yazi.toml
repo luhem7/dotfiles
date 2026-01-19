@@ -1,0 +1,20 @@
+[opener]
+play = [
+	{ run = 'mpv --mute=yes "$@"', orphan = true, for = "unix", desc = "Play with MPV" }
+]
+
+[open]
+prepend_rules = [
+	{ mime = "video/*", use = "play" },
+	{ mime = "audio/*", use = "play" }
+]
+
+[[manager.prepend_keymap]]
+on   = [ "T" ]
+run  = "plugin toggle-pane max-preview"
+desc = "Maximize or restore the preview pane"
+
+[[manager.prepend_keymap]]
+on   = [ "d" ]
+run  = "shell 'trash-put \"$@\"' --confirm"
+desc = "Move to trash"

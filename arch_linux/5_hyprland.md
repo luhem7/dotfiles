@@ -20,3 +20,6 @@ yay -S aylurs-gtk-shell
 
 ### AGS Bar Configuration
 The AGS bar configuration lives in `~/.config/ags/` with the following structure:
+
+## System Trash
+I decided to use the `trash-cli` package in order to move things to a system trash instead of using `rm` for everything.
