@@ -75,6 +75,11 @@ For system tray support, install the Astal tray library:
 yay -S libastal-tray-git
 ```
 
+For audio/volume control with PipeWire/WirePlumber:
+```bash
+yay -S libastal-wireplumber-git
+```
+
 ### AGS Bar Configuration
 The AGS bar configuration lives in `~/.config/ags/` with the following structure:
 

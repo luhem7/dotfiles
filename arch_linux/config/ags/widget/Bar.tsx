@@ -5,6 +5,7 @@ import GLib from "gi://GLib"
 import Hyprland from "gi://AstalHyprland"
 import { getSunTimes, getHourBrightness, brightnessToColor } from "../sun"
 import { SysTray } from "./Tray"
+import { Speaker, Microphone } from "./Volume"
 
 const LEFT_TRIANGLE = "" // Ctrl+v u e0b2
 const RIGHT_TRIANGLE = "" // Ctrl+v u e0b0
@@ -194,6 +195,8 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 				<box name="endbox" $type="end" hexpand halign={Gtk.Align.END}>
 					<box class="tray-container" valign={Gtk.Align.START}>
 						<label class="chevron" name="tray-chevron-left" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
+						<Speaker />
+						<Microphone />
 						<SysTray />
 					</box>
 					<menubutton class="clock">

@@ -140,6 +140,29 @@ window.Bar {
       background: $dark-bg;
     }
 
+    .volume-button {
+      background: $accent-orange;
+      margin: 0;
+      padding: 0 4px;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      min-height: 0;
+      min-width: 0;
+
+      &:hover image {
+        opacity: 0.8;
+      }
+
+      image {
+        -gtk-icon-size: 16px;
+        min-width: 16px;
+        min-height: 16px;
+        max-width: 16px;
+        max-height: 16px;
+      }
+    }
+
     .systray {
       background: $accent-orange;
       margin: 0;
