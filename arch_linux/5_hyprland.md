@@ -70,6 +70,11 @@ I installed AGS via yay:
 yay -S aylurs-gtk-shell
 ```
 
+For system tray support, install the Astal tray library:
+```bash
+yay -S libastal-tray-git
+```
+
 ### AGS Bar Configuration
 The AGS bar configuration lives in `~/.config/ags/` with the following structure:
 
