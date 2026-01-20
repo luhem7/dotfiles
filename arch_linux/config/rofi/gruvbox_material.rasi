@@ -1,0 +1,179 @@
+/**
+ * Gruvbox Material theme for rofi
+ * Based on aesthetic requirements from 5_hyprland.md
+ * Color palette: Gruvbox Material (dark)
+ */
+
+* {
+    /* Base Colors */
+    bg-dark:     #1D2021;
+    bg-off:      #433F3C;
+    fg-highlight: #EBDBB2;
+    bg-dim:      rgba(0, 0, 0, 0.25);
+
+    /* Accent Colors */
+    blue:   #427F82;
+    yellow: #D79921;
+    red:    #EA6926;
+    green:  #689D6A;
+    orange: #E0944F;
+
+    background-color: transparent;
+    text-color: @fg-highlight;
+}
+
+window {
+    fullscreen: true;
+    background-color: @bg-dim;
+
+    padding: 470 1320;  /* Centers a ~800x500 box on 3440x1440 ultrawide */
+}
+
+mainbox {
+    spacing: 0;
+    children: [inputbar, message, listview];
+    background-color: @bg-dark;
+    border: 2;
+    border-radius: 10;
+    border-color: @blue;
+}
+
+inputbar {
+    padding: 12 16;
+    spacing: 8;
+    background-color: @bg-dark;
+    text-color: @fg-highlight;
+    border: 0 0 2 0;
+    border-color: @bg-off;
+}
+
+prompt {
+    text-color: @orange;
+    margin: 0 8 0 0;
+}
+
+entry {
+    text-color: @fg-highlight;
+    placeholder-color: @bg-off;
+}
+
+case-indicator {
+    text-color: @yellow;
+}
+
+message {
+    padding: 8 16;
+    background-color: @bg-off;
+    text-color: @fg-highlight;
+}
+
+textbox {
+    text-color: inherit;
+    background-color: inherit;
+}
+
+error-message {
+    padding: 16;
+    border: 2;
+    border-color: @red;
+    background-color: @bg-dark;
+    text-color: @red;
+}
+
+listview {
+    padding: 8;
+    spacing: 4;
+    fixed-height: true;
+    border: 0;
+    background-color: @bg-dark;
+    scrollbar: false;
+}
+
+element {
+    padding: 8 16;
+    spacing: 8;
+    border-radius: 8;
+    background-color: transparent;
+    text-color: @fg-highlight;
+}
+
+element.normal.normal {
+    background-color: transparent;
+    text-color: @fg-highlight;
+}
+
+element.alternate.normal {
+    background-color: transparent;
+    text-color: @fg-highlight;
+}
+
+element.selected.normal {
+    background-color: @bg-off;
+    text-color: @fg-highlight;
+    border: 0 0 3 0;
+    border-color: @fg-highlight;
+}
+
+element.normal.active,
+element.alternate.active {
+    background-color: @orange;
+    text-color: @bg-dark;
+}
+
+element.selected.active {
+    background-color: @green;
+    text-color: @bg-dark;
+}
+
+element.normal.urgent,
+element.alternate.urgent {
+    background-color: @red;
+    text-color: @bg-dark;
+}
+
+element.selected.urgent {
+    background-color: @blue;
+    text-color: @bg-dark;
+}
+
+element-text {
+    vertical-align: 0.5;
+    background-color: inherit;
+    text-color: inherit;
+}
+
+element-icon {
+    size: 24;
+    margin: 0 8 0 0;
+    vertical-align: 0.5;
+    background-color: inherit;
+}
+
+scrollbar {
+    width: 4;
+    handle-width: 4;
+    handle-color: @bg-off;
+    background-color: @bg-dark;
+}
+
+mode-switcher {
+    padding: 8;
+    spacing: 8;
+    background-color: @bg-dark;
+    border: 2 0 0 0;
+    border-color: @bg-off;
+}
+
+button {
+    padding: 8 16;
+    border-radius: 8;
+    background-color: transparent;
+    text-color: @fg-highlight;
+}
+
+button.selected {
+    background-color: @bg-off;
+    text-color: @fg-highlight;
+    border: 0 0 3 0;
+    border-color: @fg-highlight;
+}

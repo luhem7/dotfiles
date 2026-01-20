@@ -1,29 +1,5 @@
 # This is where the ricing truely begins
 
-## Notifications with Dunst
-
-First I installed dunst and libnotify:
-```bash
-sudo pacman -S dunst libnotify
-```
-
-Dunst is added to Hyprland autostart in `hyprland.conf`:
-```bash
-exec-once = dunst
-```
-
-## Installing AGS
-I installed AGS via yay:
-```bash
-yay -S aylurs-gtk-shell
-```
-
-### AGS Bar Configuration
-The AGS bar configuration lives in `~/.config/ags/` with the following structure:
-
-## System Trash
-I decided to use the `trash-cli` package in order to move things to a system trash instead of using `rm` for everything.
-
 ## Aesthetic Notes
 
 ### Color Palette (Gruvbox Material)
@@ -53,8 +29,9 @@ I used to powerline a lot in the past, and then I stopped for a few years becaus
 
 **Typography:**
 - Font: JetBrainsMono Nerd Font
-- Weight: Bold
+- Weight: Normal
 - Style: Monospace throughout
+- Size: 11
 
 **Interactive Elements:**
 - Active elements indicated by highlights (`box-shadow: 0 3px 0 0 #EBDBB2`)
@@ -74,3 +51,34 @@ A 24-segment hour visualization that:
 3. **Functional decoration** (hour segments show time progression visually)
 4. **Minimal borders** with hover-reveal accents. Prefer a rounded border as well.
 5. **Consistent segment padding** (8px horizontal standard where possible)
+
+## Notifications with Dunst
+
+First I installed dunst and libnotify:
+```bash
+sudo pacman -S dunst libnotify
+```
+
+Dunst is added to Hyprland autostart in `hyprland.conf`:
+```bash
+exec-once = dunst
+```
+
+## Installing AGS
+I installed AGS via yay:
+```bash
+yay -S aylurs-gtk-shell
+```
+
+### AGS Bar Configuration
+The AGS bar configuration lives in `~/.config/ags/` with the following structure:
+
+## System Trash
+I decided to use the `trash-cli` package in order to move things to a system trash instead of using `rm` for everything.
+
+## Rofi
+I am using rofi as my application launcher as it now has wayland support by default:
+```bash
+sudo pacman -S rofi rofi-emoji rofi-calc
+```
+Then the rofi files need to be copied under ~/.config/rofi
