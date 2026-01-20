@@ -88,6 +88,30 @@ sudo chmod 644 /etc/polkit-1/rules.d/10-enable-suspend-wheel.rules
 sudo systemctl reload polkit
 ```
 
+## Fixing suspend freeze with NVIDIA and s2idle fallback
+On systems with NVIDIA GPUs, a failed S3 (deep) suspend can cause the system to fall back to s2idle (modern standby), which often results in a complete system freeze requiring a hard reboot.
+
+**The problem:** When suspend fails (e.g., due to a USB device being busy), Linux falls back to s2idle. The NVIDIA driver doesn't handle s2idle well, causing the system to hang.
+
+**Diagnosis:** Check previous boot logs for suspend failures:
+```bash
+journalctl -b -1 --priority=0..3 --no-pager | tail -100
+```
+Look for errors like:
+```
+xhci_hcd 0000:00:14.0: PM: failed to suspend async: error -16
+PM: Some devices failed to suspend, or early wake event detected
+PM: suspend entry (s2idle)
+```
+
+**The fix:** Disable s2idle fallback so failed suspends fail cleanly instead of freezing:
+```bash
+sudo mkdir -p /etc/systemd/sleep.conf.d
+echo -e "[Sleep]\nSuspendState=mem" | sudo tee /etc/systemd/sleep.conf.d/no-s2idle.conf
+```
+
+This forces systemd to only use S3 (deep) sleep. If S3 fails, the suspend aborts cleanly rather than falling back to s2idle. No reboot required.
+
 ## Setting up a Desktop
 I'm currently going with the [hyprland eco-system](https://wiki.archlinux.org/title/Hyprland). As noted on the page, it is good to take a look at the [Hyprland Nvidia page](https://wiki.hypr.land/Nvidia/), but I had already implemented the recommendations here!
 
