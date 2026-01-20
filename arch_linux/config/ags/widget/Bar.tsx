@@ -1,6 +1,7 @@
 import app from "ags/gtk4/app"
 import { Astal, Gtk, Gdk } from "ags/gtk4"
 import { createPoll } from "ags/time"
+import { execAsync } from "ags/process"
 import GLib from "gi://GLib"
 import Hyprland from "gi://AstalHyprland"
 import { getSunTimes, getHourBrightness, brightnessToColor } from "../sun"
@@ -204,7 +205,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 							<box>
 								<label class="chevron" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
 								<label class="time" label={time} />
-								<label class="chevron" name="chevron-right" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
+								<label class="chevron" name="chevron-clock-right" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
 							</box>
 							<box class="hour-segments" onRealize={(self) => initHourSegments(self, hour)} />
 						</box>
@@ -212,6 +213,16 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 							<Gtk.Calendar />
 						</popover>
 					</menubutton>
+					<box class="power-container" valign={Gtk.Align.START}>
+						<button
+							class="sleep-button"
+							tooltip_text="Sleep"
+							onClicked={() => execAsync(["systemctl", "suspend"])}
+						>
+							<label label="󰖔" />
+						</button>
+						<label class="chevron" name="chevron-power-right" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
+					</box>
 				</box>
 			</centerbox>
 		</window>

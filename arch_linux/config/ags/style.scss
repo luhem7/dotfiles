@@ -158,8 +158,6 @@ window.Bar {
         -gtk-icon-size: 16px;
         min-width: 16px;
         min-height: 16px;
-        max-width: 16px;
-        max-height: 16px;
       }
     }
 
@@ -202,8 +200,6 @@ window.Bar {
           -gtk-icon-size: 16px;
           min-width: 16px;
           min-height: 16px;
-          max-width: 16px;
-          max-height: 16px;
         }
       }
     }
@@ -235,8 +231,8 @@ window.Bar {
       color: $accent-green;
       background: $accent-orange;
 
-      &#chevron-right {
-        color: $dark-bg;
+      &#chevron-clock-right {
+        color: $accent-blue;
         background: $accent-green;
       }
     }
@@ -249,6 +245,34 @@ window.Bar {
         margin-right: 2px;
         transition: background 300ms ease;
       }
+    }
+  }
+
+  // ===========================================================================
+  // Power Controls
+  // ===========================================================================
+  .power-container {
+    margin: 0 8px 0 0;
+    padding: 0;
+
+    .sleep-button {
+      @include powerline-segment($accent-blue);
+      margin: 0;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      min-height: 0;
+      min-width: 0;
+
+      &:hover {
+        background: lighten($accent-blue, 10%);
+      }
+    }
+
+    #chevron-power-right {
+      @include chevron-base;
+      color: $dark-bg;
+      background: $accent-blue;
     }
   }
 }
