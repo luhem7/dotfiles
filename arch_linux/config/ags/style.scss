@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // =============================================================================
 // Color Palette (Gruvbox-inspired)
 // =============================================================================
@@ -164,7 +166,7 @@ window.Bar {
     .systray {
       background: $accent-orange;
       margin: 0;
-      padding: 0 4px;
+      padding: 0 4px 0 0;
 
       .tray-item {
         padding: 0 2px;
@@ -265,7 +267,7 @@ window.Bar {
       min-width: 0;
 
       &:hover {
-        background: lighten($accent-blue, 10%);
+        background: color.adjust($accent-blue, $lightness: 10%);
       }
     }
 
