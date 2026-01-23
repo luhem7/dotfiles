@@ -4,6 +4,7 @@ import { createPoll } from "ags/time"
 import { execAsync } from "ags/process"
 import GLib from "gi://GLib"
 import Hyprland from "gi://AstalHyprland"
+import Gtk4LayerShell from "gi://Gtk4LayerShell"
 import { getSunTimes, getHourBrightness, brightnessToColor } from "../sun"
 import { SysTray } from "./Tray"
 import { Speaker, Microphone } from "./Volume"
@@ -168,14 +169,13 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 
 	const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
 
-	return (
+	const win = (
 		<window
-			visible
+			visible={false}
 			name="bar"
 			class="Bar"
 			gdkmonitor={gdkmonitor}
 			exclusivity={Astal.Exclusivity.EXCLUSIVE}
-			layer={Astal.Layer.TOP}
 			anchor={TOP | LEFT | RIGHT}
 			application={app}
 		>
@@ -227,5 +227,11 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 				</box>
 			</centerbox>
 		</window>
-	)
+	) as Astal.Window
+
+	// Set layer BEFORE showing window (must be done before mapping)
+	Gtk4LayerShell.set_layer(win, Gtk4LayerShell.Layer.BOTTOM)
+	win.set_visible(true)
+
+	return win
 }
