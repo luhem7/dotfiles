@@ -26,12 +26,26 @@ function getWorkspaces() {
 		.sort((a, b) => a.id - b.id)
 }
 
+function getSpecialWorkspace() {
+	return hyprland.get_workspaces().find(ws => ws.id < 0)
+}
+
 function truncate(text: string, maxLength: number): string {
 	return text.length > maxLength ? text.slice(0, maxLength) + "…" : text
 }
 
 function initWorkspaces(container: Gtk.Box) {
 	const buttons = new Map<number, Gtk.Button>()
+	let specialButton: Gtk.Button | null = null
+	let specialName = ""
+
+	const animateEntry = (btn: Gtk.Button) => {
+		btn.add_css_class("entering")
+		GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
+			btn.remove_css_class("entering")
+			return GLib.SOURCE_REMOVE
+		})
+	}
 
 	const createButton = (ws: Hyprland.Workspace, animate: boolean) => {
 		const btn = new Gtk.Button()
@@ -39,52 +53,76 @@ function initWorkspaces(container: Gtk.Box) {
 		btn.add_css_class("workspace")
 		btn.connect("clicked", () => ws.focus())
 		buttons.set(ws.id, btn)
+		if (animate) animateEntry(btn)
+		return btn
+	}
 
-		if (animate) {
-			btn.add_css_class("entering")
-			GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
-				btn.remove_css_class("entering")
-				return GLib.SOURCE_REMOVE
-			})
-		}
+	const createSpecialButton = (name: string, animate: boolean) => {
+		specialName = name.startsWith("special:") ? name.slice(8) : ""
+		const btn = new Gtk.Button()
+		btn.set_child(new Gtk.Label({ label: "*" }))
+		btn.add_css_class("workspace")
+		btn.connect("clicked", () => {
+			execAsync(["hyprctl", "dispatch", "togglespecialworkspace", specialName])
+		})
+		if (animate) animateEntry(btn)
 		return btn
 	}
 
 	const updateFocus = () => {
 		const focusedId = hyprland.get_focused_workspace()?.id
+		const isSpecialFocused = !!hyprland.get_focused_monitor()?.get_special_workspace()
+
 		buttons.forEach((btn, id) => {
-			btn[id === focusedId ? "add_css_class" : "remove_css_class"]("active")
+			btn[id === focusedId && !isSpecialFocused ? "add_css_class" : "remove_css_class"]("active")
 		})
+		specialButton?.[isSpecialFocused ? "add_css_class" : "remove_css_class"]("active")
 	}
 
 	const sync = () => {
 		const workspaces = getWorkspaces()
+		const specialWs = getSpecialWorkspace()
 		const currentIds = new Set(workspaces.map(ws => ws.id))
 
-		buttons.forEach((btn, id) => {
-			if (!currentIds.has(id)) {
-				container.remove(btn)
-				buttons.delete(id)
-			}
+		// Remove stale buttons from map
+		buttons.forEach((_, id) => {
+			if (!currentIds.has(id)) buttons.delete(id)
 		})
+		if (!specialWs) specialButton = null
 
+		// Clear and rebuild container
 		while (container.get_first_child()) {
 			container.remove(container.get_first_child()!)
 		}
 
 		workspaces.forEach(ws => {
-			const btn = buttons.get(ws.id) ?? createButton(ws, true)
-			container.append(btn)
+			container.append(buttons.get(ws.id) ?? createButton(ws, true))
 		})
+
+		if (specialWs) {
+			specialButton ??= createSpecialButton(specialWs.get_name(), true)
+			container.append(specialButton)
+		}
 
 		updateFocus()
 	}
 
+	// Initial setup
 	getWorkspaces().forEach(ws => container.append(createButton(ws, false)))
+	const initialSpecial = getSpecialWorkspace()
+	if (initialSpecial) {
+		specialButton = createSpecialButton(initialSpecial.get_name(), false)
+		container.append(specialButton)
+	}
 	updateFocus()
 
+	// Event listeners
 	hyprland.connect("notify::workspaces", sync)
 	hyprland.connect("notify::focused-workspace", updateFocus)
+	hyprland.connect("notify::monitors", () => {
+		hyprland.get_monitors().forEach(m => m.connect("notify::special-workspace", updateFocus))
+	})
+	hyprland.get_monitors().forEach(m => m.connect("notify::special-workspace", updateFocus))
 }
 
 function initWindowTitle(label: Gtk.Label) {
