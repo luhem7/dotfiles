@@ -175,6 +175,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 			class="Bar"
 			gdkmonitor={gdkmonitor}
 			exclusivity={Astal.Exclusivity.EXCLUSIVE}
+			layer={Astal.Layer.TOP}
 			anchor={TOP | LEFT | RIGHT}
 			application={app}
 		>
