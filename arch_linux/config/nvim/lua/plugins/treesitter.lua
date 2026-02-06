@@ -4,19 +4,16 @@ return {
     lazy = false,
     build = ":TSUpdate",
     config = function()
-      -- Install parsers (runs async, only installs missing ones)
-      local parsers = {
-        -- Web
-        "html", "css", "javascript", "typescript", "tsx", "json",
-        -- Python
-        "python",
-        -- Rust
-        "rust", "toml",
-        -- Extras
-        "lua", "bash", "markdown", "yaml",
-      }
-      vim.cmd("TSInstall " .. table.concat(parsers, " "))
+      -- Enable treesitter highlighting for supported filetypes
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "*",
+        callback = function()
+          pcall(vim.treesitter.start)
+        end,
+      })
     end,
+    -- To install parsers, run once manually:
+    -- :TSInstall html css javascript typescript tsx json python rust toml lua bash markdown yaml
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
