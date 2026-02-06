@@ -3,7 +3,7 @@
 ## Fonts
 I like a particular monospace font!
 ```bash
-sudo pacman ttf-jetbrains-mono-nerd
+sudo pacman -S ttf-jetbrains-mono-nerd
 mkdir -p ~/.config/fontconfig
 cp ./arch_linux/config/fontconfig/fonts.conf ~/.config/fontconfig/
 fc-cache -rv
@@ -49,9 +49,9 @@ Then it just worked right off the bat.
 
 ## Installing nvim
 ```bash
-pacman -S nvim
+sudo pacman -S neovim
 ```
-Then, I followed the instructions [here](https://lazy.folke.io/installation) to install the `lazy.vim plugin manager.
+Then, I followed the instructions [here](https://lazy.folke.io/installation) to install the `lazy.vim` plugin manager.
 
 ## Useful packages
 

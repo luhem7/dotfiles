@@ -1,3 +1,6 @@
+.claude/
+.agent_memory/
+
 .venv
 
 testing_zsh.sh
