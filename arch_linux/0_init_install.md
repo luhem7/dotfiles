@@ -1,6 +1,6 @@
 # Notes on installing arch linux
-These are the tips, tricks and choices that I used when installing Arch linux on my home pc.
-- No wireless setup, because i connect to the internet using ethernet connected to my router
+These are the tips, tricks and choices that I used when installing Arch Linux on my home pc.
+- No wireless setup, because I connect to the internet using ethernet connected to my router
 - I have an nVidia 4080 graphics card.
 
 ## Install Guide
@@ -17,7 +17,7 @@ I wish I read the note that says:
 >  In the installation image, systemd-networkd, systemd-resolved, iwd and ModemManager are preconfigured and enabled by default. That will not be the case for the installed system.
 
 ### Partitioning the disks
-In my install, I wanted to fully encrypt the file system OS was going to be on including the root partition. The main page for partitioning a disk is [dm-crypt](https://wiki.archlinux.org/title/Dm-crypt), however I mostly following the guide under [Encrypting an entire system](https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system). The particular scenario I followed is [LUKS on a partition](https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#Overview)
+In my install, I wanted to fully encrypt the file system OS was going to be on including the root partition. The main page for partitioning a disk is [dm-crypt](https://wiki.archlinux.org/title/Dm-crypt), however I mostly followed the guide under [Encrypting an entire system](https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system). The particular scenario I followed is [LUKS on a partition](https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#Overview)
 
 
 **Getting information about the disks**
@@ -29,18 +29,18 @@ If one only needs the UUIDs for the drives, then `lsblk -f` suffices (and doesn'
 I used fdisk for this, it was easy enough to create the partition plans before applying them.
 - First I deleted existing partitions on the disk
 - Then I made a new GPT table on the disk
-- First I created a partition of size +4G (That's +4 Gibibytes), then set it's type as `EFI boot` (This was option 1 in the list). This was going to be `/boot` (partition /dev/sda1)
-- Next, I created a partition that went to the end of the drive, then set it's type to Linux Root System 64 bit (it was type #23 in the list). This was going to be `/` (partiion /dev/sda2)
+- First I created a partition of size +4G (That's +4 Gibibytes), then set its type as `EFI boot` (This was option 1 in the list). This was going to be `/boot` (partition /dev/sda1)
+- Next, I created a partition that went to the end of the drive, then set its type to Linux Root System 64 bit (it was type #23 in the list). This was going to be `/` (partition /dev/sda2)
 - Finally I wrote this partition scheme to the disk
 
-**Preparing non-boot paritions**
+**Preparing non-boot partitions**
 I followed the steps [under the section of the same name exactly](https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#LUKS_on_a_partition)
 
-**Preparing boot paritions**
+**Preparing boot partitions**
 I followed the steps [under the section of the same name exactly](https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#LUKS_on_a_partition)
 
 **Mounting the partitions**
-At this this point, the partitions where mounted, and I didn't have to do anything
+At this point, the partitions were mounted, and I didn't have to do anything
 
 ### Installation
 I went back to section **2. Installation** on the [Installation Guide](https://wiki.archlinux.org/title/Installation_guide)
@@ -69,13 +69,13 @@ For this, I had to go back to [the 2.5 Configuring mkinitcpio section of the enc
 
 Picking up from **2.5 Configuring mkinitcpio**:
 
-This is what I neded up putting in my `/etc/mkinitcpio.conf`:
+This is what I ended up putting in my `/etc/mkinitcpio.conf`:
 ```
 HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems fsck)
 ```
 (as in, I only added the single sd-encrypt before filesystems)
 
-And then under **2.6 Configuing the boot loader**:
+And then under **2.6 Configuring the boot loader**:
 
 Turns out that I needed to specify particular kernel parameters which lead to a long sidequest on boot-loaders and how to build the kernel. In the end, I decided to use a simple [Unified kernel image](https://wiki.archlinux.org/title/Unified_kernel_image)!
 
@@ -85,7 +85,7 @@ Back on the `luks_on_a_partition` page (yes, lots of flipping back and forth bet
 ```
 rd.luks.name=1082fcb1-9b0a-480f-86b8-fc52c135a563=root root=/dev/mapper/root
 ```
-I put my corresponding setting into `/etc/cmdline.d/50-unencrypt.conf` using the following command: (again, in this example /dev/sda/ was the OS drive, with sda2 being the cryto LUKS partition)
+I put my corresponding setting into `/etc/cmdline.d/50-unencrypt.conf` using the following command: (again, in this example /dev/sda was the OS drive, with sda2 being the crypto LUKS partition)
 ```bash
 echo "rd.luks.name=$(lsblk -dno UUID /dev/sda2)=root root=/dev/mapper/root" > /etc/cmdline.d/50-unencrypt.conf
 ```
@@ -95,7 +95,7 @@ Like above, the `esp` on this page mapped to `/boot` for me. It pretty much work
 
 After that I followed the steps on the same page under sections **1.1.3 pacman hook** and **1.1.4 Building the UKIs**. After the kernel images were built, I verified by `ls /boot/EFI/Linux/` and making sure I see a `arch-linux.efi` file there.
 
-Note: At this point `mkinitcpio -P` should;ve run successfully atleast once.
+Note: At this point `mkinitcpio -P` should've run successfully at least once.
 
 I skipped section **2. Signing the UKIs for Secure Boot** because I am not using secure boot, but it could be something I do in the future.
 
@@ -121,7 +121,7 @@ At this point, I rebooted the system using `systemctl reboot` and checked to see
     mount /dev/mapper/root /mnt 
     mount /dev/sda1 /mnt/boot
     ```
-    - Chroot into the parition: `arch-chroot /mnt`. 
+    - Chroot into the partition: `arch-chroot /mnt`. 
     - Then proceed where you left off.
 -------------------------------------------------------------
 

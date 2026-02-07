@@ -17,12 +17,11 @@ sudo pacman -S zsh-syntax-highlighting zsh-autosuggestions
 ```
 The `.zshrc` in this repo will automatically source these if installed.
 
-## Configuring Kitty
-Kitty was installed earlier. We just need to copy over the config files and restart kitty.
+## Configuring Ghostty
+Ghostty was installed earlier. We just need to copy over the config files and restart ghostty.
 ```
-cp ./arch_linux/config/kitty/*.conf ~/.config/kitty/
+cp ./arch_linux/config/ghostty/* ~/.config/ghostty/
 ```
-Then press Ctrl + Shift + F5
 
 ## Virtualbox
 I started with the [Arch VirtualBox page](https://wiki.archlinux.org/title/VirtualBox)
@@ -36,12 +35,12 @@ sudo modprobe vboxdrv
 ```
 Adding myself to the vboxusers user group to use the USB devices of my host
 ```bash
-sudo usermod vboxusers -aG $(whoami)
+sudo usermod -aG vboxusers $(whoami)
 ```
 Then, I rebooted.
 
 ## Installing node and npm
-I did not install the arch linux nodejs and npm packages. I just installed and used the arch linux package instead:
+I did not install the arch linux nodejs and npm packages. I just installed and used nvm instead:
 ```bash
 sudo pacman -S nvm
 ```

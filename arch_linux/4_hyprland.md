@@ -1,4 +1,4 @@
-# This is where the ricing truely begins
+# This is where the ricing truly begins
 
 ## Aesthetic Notes
 

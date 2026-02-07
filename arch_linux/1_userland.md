@@ -1,4 +1,5 @@
-# Userland setup Unlike the previous article, here everything happens while logged in as the primary user (and not root)
+# Userland setup
+Unlike the previous article, here everything happens while logged in as the primary user (and not root)
 
 ## Networking setup
 Jumping forward a bit, we go to **7. Networking** on the [General Recommendations Guide](https://wiki.archlinux.org/title/General_recommendations)
@@ -46,11 +47,11 @@ Then, do a reboot before going to the next section
 
 **Ensure DRM is enabled**
 
-`cat /sys/module/nvidia_drm/parameters/modeset` shoud output Y
+`cat /sys/module/nvidia_drm/parameters/modeset` should output Y
 
 **Early KMS**
 
-At this point to support early module loading of the nvidia modules, I modified the `etc/mkinitcpio.conf` as so:
+At this point to support early module loading of the nvidia modules, I modified the `/etc/mkinitcpio.conf` as so:
 1. Added the following to the modules parameter:
 ```
 MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
@@ -129,17 +130,17 @@ But really, this is already present in the included hyprland config in this repo
 Along with installing Hyprland I had to install the following mandatory and highly recommended packages:
 
 ```bash
-sudo pacman -S pipewire wireplumber wiremix hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent ghostty dolphin wofi firefox qt5-wayland qt6-wayland noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono-nerd dunst lib-notify
+sudo pacman -S pipewire wireplumber wiremix hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent ghostty dolphin wofi firefox qt5-wayland qt6-wayland noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono-nerd dunst libnotify
 ```
 
 After this, I also followed the installation guide on [their official website](https://wiki.hypr.land/Getting-Started/Master-Tutorial/)
 
-I believe that I'm supposed to be starting Hyprland via usm, but I'm happy enough starting it manually by typeing `start-hyprland` on the command line after login!
+I believe that I'm supposed to be starting Hyprland via usm, but I'm happy enough starting it manually by typing `start-hyprland` on the command line after login!
 
 **Locking the screen before going to sleep**
 Hyprlock takes care of locking the screen and Hypridle is a idle management daemon that takes care of firing off events related to the desktop being idle or going to sleep.
 
-First, copy over the config files in this repo to `~/.config/hypr/`. Then install the required packages. It is important that we copy over the config files first as hyprlock might just draw a blank screen instead of 
+First, copy over the config files in this repo to `~/.config/hypr/`. Then install the required packages. It is important that we copy over the config files first as hyprlock might just draw a blank screen instead of actually creating a password widget I can use to unlock the system!
 ```
 sudo pacman -S hyprlock hypridle
 ```
@@ -148,7 +149,7 @@ Logout of the desktop and login to verify that these changes have taken effect.
 
 
 ## Sound
-This section is something I need to refine. What I found is that arch was able to successfully detect my audio device, but it didn't make it the default. I'm currently targetting using [pipewire](https://wiki.archlinux.org/title/PipeWire) and [wireplumber](https://wiki.archlinux.org/title/WirePlumber) for all of the sound manangement and trying not to use pulse audio as much as possible.
+This section is something I need to refine. What I found is that arch was able to successfully detect my audio device, but it didn't make it the default. I'm currently targetting using [pipewire](https://wiki.archlinux.org/title/PipeWire) and [wireplumber](https://wiki.archlinux.org/title/WirePlumber) for all of the sound management and trying not to use pulse audio as much as possible.
 
 First, I wanted to lower the priority of my motherboard's optical and HDMI outputs. I wrote the necessary configuration user directory + snippets under `./config/wireplumber/` that should be copied to the corresponding directory structure in the home directory. Notably, I had to ensure that I was using configuration snippets in the `wireplumber.conf.d` directory because if I supplied just a single configuration file, it never read the global configuration file and wireplumber fails to start!
 
@@ -168,7 +169,7 @@ This is probably a good time to go about setting up yay so I can use it for inst
 ### Useful Sound utilities
 - `pipewire-pulse` Some games / applications might expect to still talk to pulseaudio, so this compatibility layer sets that up for them.
 - `wiremix` a feature rich TUI with the ability to set default sources and sinks and even do application specific routing of sources of sinks. This is like the old pavucontrol!
-- `qpwgraph` A utility has been useful so far in ensuring I have the right sets of inputs and puts setup hooked up together.
+- `qpwgraph` A utility that has been useful so far in ensuring I have the right sets of inputs and outputs hooked up together.
 
 
 ## System Backups
@@ -181,7 +182,7 @@ Then I ran the following command to see if it could detect and mount all my driv
 ```bash
 sudo timeshift --list-devices
 ```
-As part of this command, it automatically detected my second encrypted external drive. For this section, let's pretend that drive was /dev/sda/. It actually asked me for the password to unencrypt the drive. I believe that because this was the first drive it went ahead and decided that this drive would be the default snapshot device. It did some setup automatically:
+As part of this command, it automatically detected my second encrypted external drive. For this section, let's pretend that drive was /dev/sda. It actually asked me for the password to unencrypt the drive. I believe that because this was the first drive it went ahead and decided that this drive would be the default snapshot device. It did some setup automatically:
 ```
 First run mode (config file not found)
 Selected default snapshot type: RSYNC
@@ -199,19 +200,19 @@ Anyways, instead of copying over the default config and modifying the config lik
 sudo timeshift-gtk
 ```
 During the setup, I ensured that I select rsync as I have a ext4 file system.
-Now, it listed out all the devices eligible for backup, I went ahead and select /dev/sda again for device backup. I also chose to use setup 7 days of daily backups along with weekly and monthly backups.
+Now, it listed out all the devices eligible for backup, I went ahead and select /dev/sda again for device backup. I also chose to set up 7 days of daily backups along with weekly and monthly backups.
 
 Then I created the backup through the GUI as well.
 
 I validated that the backup was created by mounting that drive and viewing the backup in the corresponding `/timeshift` directory.
 
-I also validated that the timeshift config at `/etc/timeshift/timeshift.json`
+I also validated that the timeshift config at `/etc/timeshift/timeshift.json` reflected the configuration selections I made in the GUI.
 
 I can create a timeshift (when a backup is due) by running the following command:
 ```bash
 sudo timeshift --check --scripted
 ```
-This command is safe to run any time as it only creates backups when they are due based on the cadence specified in the config file. If the backup drive is not encrypted, it will prompt for the password to unencrypt the drive.
+This command is safe to run any time as it only creates backups when they are due based on the cadence specified in the config file. If the backup drive is encrypted, it will prompt for the password to unencrypt the drive.
 
 I even made a custom alias called `system_update` that takes care of running a timeshift backup before doing a full system upgrade using `yay`!
 
