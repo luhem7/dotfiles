@@ -141,6 +141,6 @@ There are some good recommendations on the [Security page](https://wiki.archlinu
 
 
 # Conclusion
-At this point, I had a minimal arch os setup on my drive. My next steps are [detailed here](./arch_linux/0_userland.md)
+At this point, I had a minimal arch os setup on my drive. My next steps are [detailed here](./1_userland.md)
 
 **TODO** Do I need to specify a pacman hook to rebuild the kernel whenever the nvidia driver package is updated?
