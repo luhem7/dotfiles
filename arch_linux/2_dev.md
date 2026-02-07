@@ -39,6 +39,20 @@ sudo usermod -aG vboxusers $(whoami)
 ```
 Then, I rebooted.
 
+## Podman
+I went with [Podman](https://wiki.archlinux.org/title/Podman) over Docker because it runs daemonless and supports rootless containers out of the box.
+
+```bash
+sudo pacman -S podman
+```
+When prompted for an OCI runtime, select `crun` — it's Podman's default runtime, written in C, lighter and faster than `runc`, with excellent rootless support.
+
+Verify the install:
+```bash
+podman info
+podman run --rm hello-world
+```
+
 ## Installing node and npm
 I did not install the arch linux nodejs and npm packages. I just installed and used nvm instead:
 ```bash
