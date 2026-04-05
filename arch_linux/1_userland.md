@@ -25,6 +25,22 @@ In addition "To provide domain name resolution for software that reads /etc/reso
 ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ```
 
+### Enabling mDNS for .local hostname resolution
+mDNS is needed to resolve `.local` hostnames on the LAN (e.g., `raspberrypi.local`). Create a drop-in override so it doesn't get overwritten on upgrades:
+```bash
+sudo mkdir -p /etc/systemd/network/89-ethernet.network.d
+sudo vim /etc/systemd/network/89-ethernet.network.d/mdns.conf
+```
+Add the following lines:
+```ini
+[Network]
+MulticastDNS=yes
+```
+Then restart networkd:
+```bash
+sudo systemctl restart systemd-networkd
+```
+
 **TODO** Setup firewalls here when you decide to open up this system to LAN.
 
 
