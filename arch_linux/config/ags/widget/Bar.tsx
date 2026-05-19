@@ -1,5 +1,6 @@
 import app from "ags/gtk4/app"
 import { Astal, Gtk, Gdk } from "ags/gtk4"
+import { createBinding, createComputed, createExternal, createState, For, With, onMount } from "ags"
 import { createPoll } from "ags/time"
 import { execAsync } from "ags/process"
 import GLib from "gi://GLib"
@@ -20,118 +21,106 @@ const BASE_COLOR = "#433F3C"
 
 const hyprland = Hyprland.get_default()
 
-function getWorkspaces() {
-	return hyprland.get_workspaces()
-		.filter(ws => ws.id > 0)
-		.sort((a, b) => a.id - b.id)
-}
+const regularWorkspaces = createBinding(hyprland, "workspaces").as(ws =>
+	ws.filter(w => w.id > 0).sort((a, b) => a.id - b.id),
+)
 
-function getSpecialWorkspace() {
-	return hyprland.get_workspaces().find(ws => ws.id < 0)
-}
+const specialWorkspace = createBinding(hyprland, "workspaces").as(ws =>
+	ws.find(w => w.id < 0) ?? null,
+)
+
+const focusedWorkspace = createBinding(hyprland, "focusedWorkspace")
+const focusedClient = createBinding(hyprland, "focusedClient")
+
+// True when the focused monitor is currently displaying a special workspace.
+// Why custom: there's no top-level Hyprland property for this — it's per-monitor.
+// We re-subscribe to each monitor's special-workspace signal when the monitor
+// list changes, and disconnect cleanly on scope teardown.
+const isSpecialActive = createExternal(false, set => {
+	const monitorListeners = new Map<Hyprland.Monitor, number>()
+	const refresh = () => set(!!hyprland.focusedMonitor?.specialWorkspace)
+
+	const rebindMonitors = () => {
+		for (const [m, id] of monitorListeners) m.disconnect(id)
+		monitorListeners.clear()
+		for (const m of hyprland.get_monitors()) {
+			monitorListeners.set(m, m.connect("notify::special-workspace", refresh))
+		}
+		refresh()
+	}
+
+	const focusedId = hyprland.connect("notify::focused-monitor", refresh)
+	const monitorsId = hyprland.connect("notify::monitors", rebindMonitors)
+	rebindMonitors()
+
+	return () => {
+		hyprland.disconnect(focusedId)
+		hyprland.disconnect(monitorsId)
+		for (const [m, id] of monitorListeners) m.disconnect(id)
+	}
+})
 
 function truncate(text: string, maxLength: number): string {
 	return text.length > maxLength ? text.slice(0, maxLength) + "…" : text
 }
 
-function initWorkspaces(container: Gtk.Box) {
-	const buttons = new Map<number, Gtk.Button>()
-	let specialButton: Gtk.Button | null = null
-	let specialName = ""
-
-	const animateEntry = (btn: Gtk.Button) => {
-		btn.add_css_class("entering")
+// State-flip drives the entering animation via the .entering CSS class on
+// .workspace (existing transition handles the fade). Pure @keyframes can't be
+// used here: <For> re-parents existing children on every update (unmap+map),
+// which would replay keyframe animations on every workspace change.
+function createEnteringFlag() {
+	const [entering, setEntering] = createState(true)
+	onMount(() => {
 		GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
-			btn.remove_css_class("entering")
+			setEntering(false)
 			return GLib.SOURCE_REMOVE
 		})
-	}
-
-	const createButton = (ws: Hyprland.Workspace, animate: boolean) => {
-		const btn = new Gtk.Button()
-		btn.set_child(new Gtk.Label({ label: `${ws.id}` }))
-		btn.add_css_class("workspace")
-		btn.connect("clicked", () => ws.focus())
-		buttons.set(ws.id, btn)
-		if (animate) animateEntry(btn)
-		return btn
-	}
-
-	const createSpecialButton = (name: string, animate: boolean) => {
-		specialName = name.startsWith("special:") ? name.slice(8) : ""
-		const btn = new Gtk.Button()
-		btn.set_child(new Gtk.Label({ label: "*" }))
-		btn.add_css_class("workspace")
-		btn.connect("clicked", () => {
-			execAsync(["hyprctl", "dispatch", "togglespecialworkspace", specialName])
-		})
-		if (animate) animateEntry(btn)
-		return btn
-	}
-
-	const updateFocus = () => {
-		const focusedId = hyprland.get_focused_workspace()?.id
-		const isSpecialFocused = !!hyprland.get_focused_monitor()?.get_special_workspace()
-
-		buttons.forEach((btn, id) => {
-			btn[id === focusedId && !isSpecialFocused ? "add_css_class" : "remove_css_class"]("active")
-		})
-		specialButton?.[isSpecialFocused ? "add_css_class" : "remove_css_class"]("active")
-	}
-
-	const sync = () => {
-		const workspaces = getWorkspaces()
-		const specialWs = getSpecialWorkspace()
-		const currentIds = new Set(workspaces.map(ws => ws.id))
-
-		// Remove stale buttons from map
-		buttons.forEach((_, id) => {
-			if (!currentIds.has(id)) buttons.delete(id)
-		})
-		if (!specialWs) specialButton = null
-
-		// Clear and rebuild container
-		while (container.get_first_child()) {
-			container.remove(container.get_first_child()!)
-		}
-
-		workspaces.forEach(ws => {
-			container.append(buttons.get(ws.id) ?? createButton(ws, true))
-		})
-
-		if (specialWs) {
-			specialButton ??= createSpecialButton(specialWs.get_name(), true)
-			container.append(specialButton)
-		}
-
-		updateFocus()
-	}
-
-	// Initial setup
-	getWorkspaces().forEach(ws => container.append(createButton(ws, false)))
-	const initialSpecial = getSpecialWorkspace()
-	if (initialSpecial) {
-		specialButton = createSpecialButton(initialSpecial.get_name(), false)
-		container.append(specialButton)
-	}
-	updateFocus()
-
-	// Event listeners
-	hyprland.connect("notify::workspaces", sync)
-	hyprland.connect("notify::focused-workspace", updateFocus)
-	hyprland.connect("notify::monitors", () => {
-		hyprland.get_monitors().forEach(m => m.connect("notify::special-workspace", updateFocus))
 	})
-	hyprland.get_monitors().forEach(m => m.connect("notify::special-workspace", updateFocus))
+	return entering
 }
 
-function initWindowTitle(label: Gtk.Label) {
-	const update = () => {
-		const title = hyprland.get_focused_client()?.get_title() || "Desktop"
-		label.set_label(truncate(title, TITLE_MAX_LENGTH))
-	}
-	update()
-	hyprland.connect("notify::focused-client", update)
+function classes(...parts: (string | false | null | undefined)[]): string {
+	return parts.filter(Boolean).join(" ")
+}
+
+function WorkspaceButton({ ws }: { ws: Hyprland.Workspace }) {
+	const entering = createEnteringFlag()
+	const className = createComputed(() =>
+		classes(
+			"workspace",
+			focusedWorkspace()?.id === ws.id && !isSpecialActive() && "active",
+			entering() && "entering",
+		),
+	)
+
+	return (
+		<button class={className} onClicked={() => ws.focus()}>
+			<label label={`${ws.id}`} />
+		</button>
+	)
+}
+
+function SpecialWorkspaceButton({ ws }: { ws: Hyprland.Workspace }) {
+	const entering = createEnteringFlag()
+	const rawName = ws.get_name()
+	const name = rawName.startsWith("special:") ? rawName.slice(8) : ""
+	const className = createComputed(() =>
+		classes("workspace", isSpecialActive() && "active", entering() && "entering"),
+	)
+
+	return (
+		<button
+			class={className}
+			onClicked={() => execAsync(["hyprctl", "dispatch", "togglespecialworkspace", name])}
+		>
+			<label label="*" />
+		</button>
+	)
+}
+
+function WindowTitle() {
+	const label = focusedClient.as(c => truncate(c?.get_title() || "Desktop", TITLE_MAX_LENGTH))
+	return <label class="window-title" label={label} />
 }
 
 function initHourSegments(container: Gtk.Box, hourPoll: ReturnType<typeof createPoll<number>>) {
@@ -223,9 +212,16 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 						<label name="chevron-open" valign={Gtk.Align.CENTER} label={RIGHT_TRIANGLE} />
 						<label class="userhost" label={userhost} />
 						<label name="chevron-mid" valign={Gtk.Align.CENTER} label={RIGHT_TRIANGLE} />
-						<box class="workspaces" onRealize={initWorkspaces} />
+						<box class="workspaces">
+							<For each={regularWorkspaces} id={ws => ws.id}>
+								{ws => <WorkspaceButton ws={ws} />}
+							</For>
+							<With value={specialWorkspace}>
+								{ws => ws && <SpecialWorkspaceButton ws={ws} />}
+							</With>
+						</box>
 						<label name="chevron-yellow-red" valign={Gtk.Align.CENTER} label={RIGHT_TRIANGLE} />
-						<label class="window-title" onRealize={initWindowTitle} />
+						<WindowTitle />
 						<label name="chevron-right" valign={Gtk.Align.CENTER} label={RIGHT_TRIANGLE} />
 					</box>
 				</box>
