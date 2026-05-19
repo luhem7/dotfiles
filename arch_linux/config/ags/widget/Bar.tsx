@@ -83,6 +83,12 @@ function classes(...parts: (string | false | null | undefined)[]): string {
 	return parts.filter(Boolean).join(" ")
 }
 
+// Workspace clicks dispatch via hyprctl using the new Lua syntax instead of
+// ws.focus(). Since Hyprland 0.55, IPC dispatch is interpreted as Lua, so the
+// legacy "dispatch workspace <id>" payload that AstalHyprland still emits
+// (verified in libastal-hyprland's workspace.c) gets rejected with a parse
+// error. The special-workspace toggle below has the same problem. Revisit
+// once libastal-hyprland-git updates upstream (broken as of 2026-05-19).
 function WorkspaceButton({ ws }: { ws: Hyprland.Workspace }) {
 	const entering = createEnteringFlag()
 	const className = createComputed(() =>
@@ -94,7 +100,10 @@ function WorkspaceButton({ ws }: { ws: Hyprland.Workspace }) {
 	)
 
 	return (
-		<button class={className} onClicked={() => ws.focus()}>
+		<button
+			class={className}
+			onClicked={() => execAsync(["hyprctl", "dispatch", `hl.dsp.focus({ workspace = ${ws.id} })`])}
+		>
 			<label label={`${ws.id}`} />
 		</button>
 	)
@@ -111,7 +120,7 @@ function SpecialWorkspaceButton({ ws }: { ws: Hyprland.Workspace }) {
 	return (
 		<button
 			class={className}
-			onClicked={() => execAsync(["hyprctl", "dispatch", "togglespecialworkspace", name])}
+			onClicked={() => execAsync(["hyprctl", "dispatch", `hl.dsp.workspace.toggle_special("${name}")`])}
 		>
 			<label label="*" />
 		</button>
