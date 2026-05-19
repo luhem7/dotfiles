@@ -1,7 +1,14 @@
 import { Gtk } from "ags/gtk4"
+import { execAsync } from "ags/process"
 import Wp from "gi://AstalWp"
+import GLib from "gi://GLib"
 
 const wp = Wp.get_default()
+
+// Toggling mute directly on the Schiit Magni Unity sink leaves its anti-pop
+// output relay engaged. Route speaker mute through this script, which bounces
+// the device profile on unmute to force a USB re-init. See 1_userland.md.
+const AUDIO_MUTE_SCRIPT = `${GLib.get_home_dir()}/.local/bin/audio-mute-toggle.sh`
 
 function initSpeaker(button: Gtk.Button) {
   const speaker = wp?.get_default_speaker()
@@ -32,9 +39,9 @@ function initSpeaker(button: Gtk.Button) {
   speaker.connect("notify::mute", updateTooltip)
   updateTooltip()
 
-  // Click to toggle mute
+  // Click to toggle mute via the workaround script (see comment above).
   button.connect("clicked", () => {
-    speaker.set_mute(!speaker.get_mute())
+    execAsync([AUDIO_MUTE_SCRIPT]).catch((err) => console.error("audio-mute-toggle failed:", err))
   })
 
   // Scroll to adjust volume

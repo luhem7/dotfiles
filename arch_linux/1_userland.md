@@ -178,6 +178,23 @@ If the service fails to start use the following command to check what failed `jo
 
 We can run `speaker-test -c 2 -l 1` to play a sound through the front stereo speakers to see if the settings are working.
 
+### Schiit Magni Unity mute workaround
+The Schiit Magni Unity exposes a USB Audio Class hardware mute control (visible to ALSA as `numid=2,iface=MIXER,name='PCM Playback Switch'`). When wireplumber translates a `wpctl set-mute` into a toggle of that hardware control, the Magni Unity's anti-pop output relay engages — and on unmute, the relay does not reliably release. The software state correctly reports "unmuted" while the analog stage stays silent until the USB device is reinitialized (a reboot, a USB replug, or a profile bounce).
+
+Things that were tried but did **not** work:
+- `api.alsa.soft-mixer = true` as a `monitor.alsa.rules` action against the Schiit's `node.name`. The property is happily set on the node, but the installed PipeWire's ALSA backend (`/usr/lib/spa-0.2/alsa/libspa-alsa.so`) does not consume it — strings in that lib only reference `api.alsa.bind-ctls`, `api.alsa.bind-ctl.%s`, `api.alsa.disable-mixer-path`, etc. Wireplumber still flips `PCM Playback Switch` on every mute toggle and the relay still gets stuck.
+
+The pragmatic workaround:
+1. `./utils/audio-mute-toggle.sh` toggles mute, and on the unmute leg bounces the Schiit's device profile (`wpctl set-profile <dev_id> 0` → `sleep 0.3` → `set-profile 1`). The profile bounce forces a USB re-init which releases the relay.
+2. Install it: `mkdir -p ~/.local/bin && install -m 0755 ./utils/audio-mute-toggle.sh ~/.local/bin/audio-mute-toggle.sh`
+3. The `XF86AudioMute` binding in `config/hypr/hyprland.lua` calls this script instead of `wpctl set-mute` directly.
+
+Recovery command if you ever hit the stuck-relay state manually (e.g. via the system tray icon, which still calls `wpctl set-mute` and is not yet routed through the script):
+```bash
+SCHIIT_DEV=$(wpctl status | awk '/Devices:/,/Sinks:/' | grep -F "Schiit Magni Unity" | grep -oE '[0-9]+\.' | tr -d '.' | head -1)
+wpctl set-profile "$SCHIIT_DEV" 0 && sleep 0.3 && wpctl set-profile "$SCHIIT_DEV" 1
+```
+
 ## yay for AUR packages
 This is probably a good time to go about setting up yay so I can use it for installing and updating packages from the AUR.
 
