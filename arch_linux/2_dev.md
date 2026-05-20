@@ -66,6 +66,18 @@ sudo pacman -S neovim
 ```
 Then, I followed the instructions [here](https://lazy.folke.io/installation) to install the `lazy.vim` plugin manager.
 
+### tree-sitter-cli
+Required by `nvim-treesitter` to compile language parsers when running `:TSInstall <lang>` or `:TSUpdate`. Without it, `:checkhealth nvim-treesitter` reports `tree-sitter-cli not found` and parser installs fail.
+```bash
+sudo pacman -S tree-sitter-cli
+```
+
+### wl-clipboard
+Needed for nvim's `unnamedplus` clipboard integration to share yanks with the Wayland system clipboard. `init.lua` only enables system-clipboard sharing when `wl-copy` is on PATH.
+```bash
+sudo pacman -S wl-clipboard
+```
+
 ## Useful packages
 
 ### lsd
