@@ -13,5 +13,10 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.softtabstop = 4
 
+-- Share yank register with system clipboard when wl-clipboard is available
+if vim.fn.executable("wl-copy") == 1 then
+	vim.opt.clipboard = "unnamedplus"
+end
+
 -- Keybindings
 vim.keymap.set('n', '<leader>rs', ':source $MYVIMRC | echo "Config reloaded!"<CR>', { desc = 'Reload System Config' })
