@@ -77,7 +77,7 @@ export function Media() {
   )
 
   return (
-    <box class="media-container" visible={mediaVisible}>
+    <box class="media-container" visible={mediaVisible} valign={Gtk.Align.START}>
       <label class="chevron" name="media-chevron-left" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
       <button
         class="media-button"

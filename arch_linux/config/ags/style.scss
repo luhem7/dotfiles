@@ -17,7 +17,10 @@ $accent-orange: #E0944F;
 // Mixins
 // =============================================================================
 
-// Shared container styles for startbox/endbox
+// Shared container styles for startbox/endbox.
+// Fixed max-height keeps the bar a constant size even when Pango falls back to
+// a taller font for special-char glyphs (emoji/CJK) in window titles or media
+// metadata. Tall glyphs get clipped rather than stretching the bar.
 @mixin panel-container {
   background: $dark-bg;
   color: $dark-bg;
@@ -25,6 +28,8 @@ $accent-orange: #E0944F;
   border-top: none;
   border-radius: 0 0 8px 8px;
   transition: border-color 300ms ease;
+  min-height: 0;
+  max-height: 28px;
 
   &:hover {
     border-color: $accent-orange;
@@ -35,6 +40,7 @@ $accent-orange: #E0944F;
 @mixin chevron-base {
   margin: 0;
   font-size: 1em;
+  min-height: 0;
 }
 
 // Powerline segment with accent background
@@ -42,6 +48,7 @@ $accent-orange: #E0944F;
   padding: 0 8px;
   background: $bg-color;
   color: $dark-bg;
+  min-height: 0;
 }
 
 // =============================================================================
@@ -142,8 +149,12 @@ window.Bar {
       background: $dark-bg;
     }
 
-    &.media-active #tray-chevron-left {
-      background: $accent-red;
+    &.media-active {
+      margin-left: 0;
+
+      #tray-chevron-left {
+        background: $accent-red;
+      }
     }
 
     .volume-button {
@@ -218,6 +229,11 @@ window.Bar {
     margin: 0 0 0 8px;
     padding: 0;
     background: $accent-red;
+    min-height: 0;
+
+    > * {
+      min-height: 0;
+    }
 
     #media-chevron-left {
       @include chevron-base;
@@ -241,12 +257,14 @@ window.Bar {
 
       label {
         color: $dark-bg;
+        min-height: 0;
       }
     }
 
     .media-text {
       color: $dark-bg;
       padding: 0 4px;
+      min-height: 0;
     }
   }
 
