@@ -23,15 +23,11 @@ function pickPlayer(): Mpris.Player | null {
 // (e.g. playback_status flip on play/pause while the same player stays active).
 const [playbackStatus, setPlaybackStatus] = createState<Mpris.PlaybackStatus | null>(null)
 const [displayText, setDisplayText] = createState("")
-const [canPrev, setCanPrev] = createState(false)
-const [canNext, setCanNext] = createState(false)
 
 function syncDerived() {
   const p = pickPlayer()
   setPlaybackStatus(p?.playback_status ?? null)
   setDisplayText(p ? truncate(`${p.artist ?? ""} — ${p.title ?? ""}`, MEDIA_MAX_LENGTH) : "")
-  setCanPrev(p?.can_go_previous ?? false)
-  setCanNext(p?.can_go_next ?? false)
 }
 
 const activePlayer = createExternal<Mpris.Player | null>(null, set => {
@@ -51,8 +47,6 @@ const activePlayer = createExternal<Mpris.Player | null>(null, set => {
         player.connect("notify::playback-status", () => { set(pickPlayer()); syncDerived() }),
         player.connect("notify::title", () => { set(pickPlayer()); syncDerived() }),
         player.connect("notify::artist", () => { set(pickPlayer()); syncDerived() }),
-        player.connect("notify::can-go-next", () => { set(pickPlayer()); syncDerived() }),
-        player.connect("notify::can-go-previous", () => { set(pickPlayer()); syncDerived() }),
       ]
       playerHandlers.set(player, ids)
     }
@@ -84,23 +78,9 @@ export function Media() {
       <label class="chevron" name="media-chevron-left" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
       <button
         class="media-button"
-        sensitive={canPrev}
-        onClicked={() => activePlayer()?.previous()}
-      >
-        <label label="󰒮" />
-      </button>
-      <button
-        class="media-button"
         onClicked={() => activePlayer()?.play_pause()}
       >
         <label label={playPauseIcon} />
-      </button>
-      <button
-        class="media-button"
-        sensitive={canNext}
-        onClicked={() => activePlayer()?.next()}
-      >
-        <label label="󰒭" />
       </button>
       <label class={mediaTextClass} label={displayText} />
     </box>
