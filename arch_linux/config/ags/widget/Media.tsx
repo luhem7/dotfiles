@@ -1,10 +1,12 @@
 import { Gtk } from "ags/gtk4"
 import { createExternal, createState, createComputed } from "ags"
+import { createPoll } from "ags/time"
 import Mpris from "gi://AstalMpris"
 import { LEFT_TRIANGLE } from "../constants"
 import { truncate, hasTallGlyphs } from "../util"
 
 const MEDIA_MAX_LENGTH = 40
+const PROGRESS_POLL_MS = 250
 
 const mpris = Mpris.get_default()
 
@@ -70,6 +72,71 @@ const activePlayer = createExternal<Mpris.Player | null>(null, set => {
 })
 
 export const mediaVisible = createComputed(() => activePlayer() !== null)
+
+type ProgressSnapshot = {
+  mode: "hidden" | "determinate" | "indeterminate"
+  fraction: number
+}
+
+// Brute-force: re-read position/length/status from the active player every
+// PROGRESS_POLL_MS. Keeps the implementation trivial — no baseline math, no
+// signal handlers to keep in sync.
+const progress = createPoll<ProgressSnapshot>(
+  { mode: "hidden", fraction: 0 },
+  PROGRESS_POLL_MS,
+  () => {
+    const p = pickPlayer()
+    if (!p) return { mode: "hidden", fraction: 0 }
+    const length = p.length ?? 0
+    const position = p.position ?? 0
+    if (length > 0) {
+      return {
+        mode: "determinate",
+        fraction: Math.max(0, Math.min(1, position / length)),
+      }
+    }
+    if (p.playback_status === Mpris.PlaybackStatus.PLAYING) {
+      return { mode: "indeterminate", fraction: 0 }
+    }
+    return { mode: "hidden", fraction: 0 }
+  }
+)
+
+export const progressVisible = createComputed(() => progress().mode !== "hidden")
+
+export function initProgressBar(self: Gtk.Box) {
+  const provider = new Gtk.CssProvider()
+  self.get_style_context().add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+  const apply = (snap: ProgressSnapshot) => {
+    if (snap.mode === "determinate") {
+      self.remove_css_class("shimmer")
+      const p = Math.max(0, Math.min(100, snap.fraction * 100))
+      const start = Math.max(0, p - 6)
+      const end = Math.min(100, p + 1)
+      const css = `* {
+        background: linear-gradient(
+          to right,
+          #EA6926 0%,
+          #EA6926 ${start}%,
+          #FBC68A ${p}%,
+          #1D2021 ${end}%,
+          #1D2021 100%
+        );
+      }`
+      provider.load_from_string(css)
+    } else if (snap.mode === "indeterminate") {
+      provider.load_from_string("")
+      self.add_css_class("shimmer")
+    } else {
+      provider.load_from_string("")
+      self.remove_css_class("shimmer")
+    }
+  }
+
+  apply(progress.get())
+  progress.subscribe(() => apply(progress.get()))
+}
 
 export function Media() {
   const playPauseIcon = createComputed(() =>

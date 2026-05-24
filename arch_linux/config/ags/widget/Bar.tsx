@@ -12,7 +12,7 @@ import { Speaker, Microphone } from "./Volume"
 import { Screenshot } from "./Screenshot"
 import { LEFT_TRIANGLE, RIGHT_TRIANGLE } from "../constants"
 import { truncate, hasTallGlyphs } from "../util"
-import { Media, mediaVisible } from "./Media"
+import { Media, mediaVisible, progressVisible, initProgressBar } from "./Media"
 
 const TITLE_MAX_LENGTH = 30
 const HOUR_SEGMENTS = 24
@@ -239,9 +239,18 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 				<box $type="center" />
 
 				<box name="endbox" $type="end" hexpand halign={Gtk.Align.END}>
-					<Media />
-					<box class={mediaVisible.as(v => v ? "tray-container media-active" : "tray-container")} valign={Gtk.Align.START}>
-						<label class="chevron" name="tray-chevron-left" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
+					<box
+						class={mediaVisible.as(v => v ? "media-wrapper media-active" : "media-wrapper")}
+						orientation={Gtk.Orientation.VERTICAL}
+						valign={Gtk.Align.START}
+					>
+						<box>
+							<Media />
+							<label class="chevron" name="tray-chevron-left" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
+						</box>
+						<box class="media-progress" visible={progressVisible} onRealize={initProgressBar} />
+					</box>
+					<box class="tray-container" valign={Gtk.Align.START}>
 						<Speaker />
 						<Microphone />
 						<Screenshot />

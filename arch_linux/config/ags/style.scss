@@ -144,11 +144,13 @@ window.Bar {
   }
 
   // ===========================================================================
-  // System Tray
+  // Media wrapper (Media row + tray-chevron + progress strip)
   // ===========================================================================
-  .tray-container {
+  // Holds the media row and the tray's left chevron in a shared horizontal row,
+  // with the track-progress strip below — so the progress bar can span both
+  // the media-container and the chevron transitioning into the tray.
+  .media-wrapper {
     margin: 0 0 0 8px;
-    padding: 0;
 
     #tray-chevron-left {
       @include chevron-base;
@@ -156,13 +158,45 @@ window.Bar {
       background: $dark-bg;
     }
 
-    &.media-active {
-      margin-left: 0;
+    &.media-active #tray-chevron-left {
+      background: $accent-red;
+    }
 
-      #tray-chevron-left {
-        background: $accent-red;
+    .media-progress {
+      min-height: 3px;
+      // Skip the dark-bg left media-chevron at the start of the row; the
+      // right edge naturally extends under the tray-chevron-left since both
+      // live in this wrapper.
+      margin: 0 0 0 10px;
+
+      &.shimmer {
+        background: linear-gradient(
+          90deg,
+          $dark-bg 0%,
+          $dark-bg 30%,
+          $accent-red 50%,
+          $dark-bg 70%,
+          $dark-bg 100%
+        );
+        background-size: 200% 100%;
+        animation: media-shimmer 1.4s linear infinite;
       }
     }
+  }
+
+  // ===========================================================================
+  // System Tray
+  // ===========================================================================
+  .tray-container {
+    margin: 0;
+    padding: 0;
+    // The chevron used to live here with `valign: center` and set the
+    // container's natural height via its font glyph. With the chevron moved
+    // into .media-wrapper, the buttons collapse to icon height (~16px) and
+    // a dark band shows below them. Pin the height to match the media row,
+    // which is bounded by panel-container's 28px max-height minus the 2px
+    // bottom border and a small visual margin.
+    min-height: 20px;
 
     .volume-button {
       background: $accent-orange;
@@ -233,7 +267,7 @@ window.Bar {
   // Media Widget
   // ===========================================================================
   .media-container {
-    margin: 0 0 0 8px;
+    margin: 0;
     padding: 0;
     background: $accent-red;
     min-height: 0;
@@ -348,4 +382,12 @@ window.Bar {
       background: $accent-blue;
     }
   }
+}
+
+// Drives the indeterminate-state animation for `.media-progress.shimmer`.
+// Top-level so the @keyframes is emitted at root scope; nesting it inside a
+// selector confuses some CSS parsers.
+@keyframes media-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
