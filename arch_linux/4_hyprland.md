@@ -52,6 +52,12 @@ A 24-segment hour visualization that:
 4. **Minimal borders** with hover-reveal accents. Prefer a rounded border as well.
 5. **Consistent segment padding** (8px horizontal standard where possible)
 
+## Taking screenshots with hyprshot
+This is a wrapper around the grim + slurp utilities. Simple install:
+```
+sudo pacman -S hyprshot
+```
+
 ## Notifications with Dunst
 
 First I installed dunst and libnotify:
@@ -82,7 +88,7 @@ yay -S libastal-wireplumber-git
 
 For the MPRIS now-playing widget (shows current track + prev/play-pause/next in the bar):
 ```bash
-yay -S libastal-mpris-git
+yay -S quarrel libastal-mpris-git
 ```
 
 ### AGS Bar Configuration
