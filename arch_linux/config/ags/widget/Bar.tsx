@@ -9,6 +9,7 @@ import Gtk4LayerShell from "gi://Gtk4LayerShell"
 import { getSunTimes, getHourBrightness, brightnessToColor } from "../sun"
 import { SysTray } from "./Tray"
 import { Speaker, Microphone } from "./Volume"
+import { Screenshot } from "./Screenshot"
 import { LEFT_TRIANGLE, RIGHT_TRIANGLE } from "../constants"
 import { truncate, hasTallGlyphs } from "../util"
 import { Media, mediaVisible } from "./Media"
@@ -243,6 +244,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 						<label class="chevron" name="tray-chevron-left" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
 						<Speaker />
 						<Microphone />
+						<Screenshot />
 						<SysTray />
 					</box>
 					<menubutton class="clock">
