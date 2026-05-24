@@ -103,3 +103,10 @@ I am using rofi as my application launcher as it now has wayland support by defa
 sudo pacman -S rofi rofi-emoji rofi-calc
 ```
 Then the rofi files need to be copied under ~/.config/rofi
+
+## Apple Music with Sidra
+For Apple Music on Linux I use [Sidra](https://github.com/wimpysworld/sidra) — a desktop wrapper around `music.apple.com` that exposes proper bi-directional MPRIS at `org.mpris.MediaPlayer2.sidra`. Picked over Cider because Cider hardcodes a 96 kHz `AudioContext` and double-resamples everything through a DSP chain; Sidra leaves audio untouched.
+```bash
+yay -S sidra-bin
+```
+Why this matters for the bar: Apple Music inside Firefox/Chromium exposes MPRIS via the browser's MediaSession bridge, and music.apple.com's MediaSession implementation is buggy — `nexttrack`/`previoustrack` handlers stop playback instead of advancing, and `setPositionState` reports `mpris:length` inconsistently (sometimes `-1`, sometimes the wrong units). Sidra owns the player state directly, so the AGS media widget's skip buttons and any future track-progress visualisation actually work.
