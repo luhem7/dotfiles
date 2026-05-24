@@ -14,6 +14,14 @@ $accent-green: #689D6A;
 $accent-orange: #E0944F;
 
 // =============================================================================
+// Sizes
+// =============================================================================
+// Shared inner-row height for bar segments (media row, tray icons, clock time
+// row, power controls). Empirically tuned so icon-only rows line up with rows
+// whose height would otherwise be set by chevron font glyphs.
+$bar-row-height: 20px;
+
+// =============================================================================
 // Mixins
 // =============================================================================
 
@@ -190,13 +198,10 @@ window.Bar {
   .tray-container {
     margin: 0;
     padding: 0;
-    // The chevron used to live here with `valign: center` and set the
-    // container's natural height via its font glyph. With the chevron moved
-    // into .media-wrapper, the buttons collapse to icon height (~16px) and
-    // a dark band shows below them. Pin the height to match the media row,
-    // which is bounded by panel-container's 28px max-height minus the 2px
-    // bottom border and a small visual margin.
-    min-height: 20px;
+    // Without the chevron (now in .media-wrapper), the buttons would collapse
+    // to icon height (~16px) and a dark band would show below them. Pin to
+    // the shared bar-row height so icons align with the media row.
+    min-height: $bar-row-height;
 
     .volume-button {
       background: $accent-orange;
@@ -270,7 +275,10 @@ window.Bar {
     margin: 0;
     padding: 0;
     background: $accent-red;
-    min-height: 0;
+    // Floor matches tray-container so the two rows align visually. Children
+    // keep `min-height: 0` so tall fallback glyphs still clip rather than
+    // stretching the bar.
+    min-height: $bar-row-height;
 
     > * {
       min-height: 0;
