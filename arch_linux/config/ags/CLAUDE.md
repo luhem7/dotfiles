@@ -39,6 +39,13 @@ ags quit
 
 - **app.ts** - Entry point that initializes the application, loads CSS, and creates widgets for each monitor
 - **widget/** - TSX components for UI widgets (Gnim JSX with `jsxImportSource: "ags/gtk4"`)
+  - **widget/Bar.tsx** - Main top bar (workspaces, window title, volume/tray, media, clock, power)
+  - **widget/Volume.tsx** - Speaker and microphone buttons (AstalWp/WirePlumber)
+  - **widget/Tray.tsx** - System tray icons (AstalTray)
+  - **widget/Media.tsx** - MPRIS now-playing widget: auto-tracks active player, shows prev/play-pause/next + "Artist — Title" (AstalMpris)
+- **constants.ts** - Shared Nerd Font glyph constants (`LEFT_TRIANGLE`, `RIGHT_TRIANGLE`)
+- **util.ts** - Shared utilities (`truncate`)
+- **sun.ts** - Solar position calculator for the clock's hour-segment visualization
 - **style.scss** - SCSS styling using GTK/Adwaita theme variables (e.g., `@theme_fg_color`, `@theme_bg_color`)
 - **@girs/** - Auto-generated TypeScript definitions for GObject libraries (gitignored, regenerate with `ags types`)
 - **env.d.ts** - Type declarations for special imports (inline:*, *.scss, *.blp, *.css)

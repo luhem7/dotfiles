@@ -142,6 +142,10 @@ window.Bar {
       background: $dark-bg;
     }
 
+    &.media-active #tray-chevron-left {
+      background: $accent-red;
+    }
+
     .volume-button {
       background: $accent-orange;
       margin: 0;
@@ -204,6 +208,45 @@ window.Bar {
           min-height: 16px;
         }
       }
+    }
+  }
+
+  // ===========================================================================
+  // Media Widget
+  // ===========================================================================
+  .media-container {
+    margin: 0 0 0 8px;
+    padding: 0;
+    background: $accent-red;
+
+    #media-chevron-left {
+      @include chevron-base;
+      color: $accent-red;
+      background: $dark-bg;
+    }
+
+    .media-button {
+      background: $accent-red;
+      margin: 0;
+      padding: 0 4px;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      min-height: 0;
+      min-width: 0;
+
+      &:hover label {
+        opacity: 0.8;
+      }
+
+      label {
+        color: $dark-bg;
+      }
+    }
+
+    .media-text {
+      color: $dark-bg;
+      padding: 0 4px;
     }
   }
 

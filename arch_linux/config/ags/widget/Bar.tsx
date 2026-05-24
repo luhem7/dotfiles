@@ -9,9 +9,10 @@ import Gtk4LayerShell from "gi://Gtk4LayerShell"
 import { getSunTimes, getHourBrightness, brightnessToColor } from "../sun"
 import { SysTray } from "./Tray"
 import { Speaker, Microphone } from "./Volume"
+import { LEFT_TRIANGLE, RIGHT_TRIANGLE } from "../constants"
+import { truncate } from "../util"
+import { Media, mediaVisible } from "./Media"
 
-const LEFT_TRIANGLE = "" // Ctrl+v u e0b2
-const RIGHT_TRIANGLE = "" // Ctrl+v u e0b0
 const TITLE_MAX_LENGTH = 30
 const HOUR_SEGMENTS = 24
 
@@ -60,9 +61,6 @@ const isSpecialActive = createExternal(false, set => {
 	}
 })
 
-function truncate(text: string, maxLength: number): string {
-	return text.length > maxLength ? text.slice(0, maxLength) + "…" : text
-}
 
 // State-flip drives the entering animation via the .entering CSS class on
 // .workspace (existing transition handles the fade). Pure @keyframes can't be
@@ -238,7 +236,8 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 				<box $type="center" />
 
 				<box name="endbox" $type="end" hexpand halign={Gtk.Align.END}>
-					<box class="tray-container" valign={Gtk.Align.START}>
+					<Media />
+					<box class={mediaVisible.as(v => v ? "tray-container media-active" : "tray-container")} valign={Gtk.Align.START}>
 						<label class="chevron" name="tray-chevron-left" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
 						<Speaker />
 						<Microphone />

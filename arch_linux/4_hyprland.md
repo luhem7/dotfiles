@@ -80,6 +80,11 @@ For audio/volume control with PipeWire/WirePlumber:
 yay -S libastal-wireplumber-git
 ```
 
+For the MPRIS now-playing widget (shows current track + prev/play-pause/next in the bar):
+```bash
+yay -S libastal-mpris-git
+```
+
 ### AGS Bar Configuration
 The AGS bar configuration lives in `~/.config/ags/` with the following structure:
 
