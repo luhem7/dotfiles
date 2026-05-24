@@ -269,6 +269,8 @@ hl.bind(mainMod ..           " + V",      hl.dsp.window.float({ action = "toggle
 hl.bind(mainMod ..           " + Space",  hl.dsp.exec_cmd(menu))
 hl.bind(mainMod ..           " + P",      hl.dsp.window.pseudo())                 -- dwindle
 hl.bind(mainMod ..           " + J",      hl.dsp.layout("togglesplit"))           -- dwindle
+hl.bind(mainMod ..           " + Print",  hl.dsp.exec_cmd("hyprshot -m region --clipboard-only"))
+hl.bind(mainMod .. " + SHIFT + Print",    hl.dsp.exec_cmd("bash -c 'hyprshot -m output -o ~ -f screenshot_$(date +%Y-%m-%dT%H-%M-%S).jpg'"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
