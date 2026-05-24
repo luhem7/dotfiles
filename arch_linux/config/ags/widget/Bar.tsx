@@ -10,7 +10,7 @@ import { getSunTimes, getHourBrightness, brightnessToColor } from "../sun"
 import { SysTray } from "./Tray"
 import { Speaker, Microphone } from "./Volume"
 import { LEFT_TRIANGLE, RIGHT_TRIANGLE } from "../constants"
-import { truncate } from "../util"
+import { truncate, hasTallGlyphs } from "../util"
 import { Media, mediaVisible } from "./Media"
 
 const TITLE_MAX_LENGTH = 30
@@ -126,8 +126,10 @@ function SpecialWorkspaceButton({ ws }: { ws: Hyprland.Workspace }) {
 }
 
 function WindowTitle() {
-	const label = focusedClient.as(c => truncate(c?.get_title() || "Desktop", TITLE_MAX_LENGTH))
-	return <label class="window-title" label={label} />
+	const rawTitle = focusedClient.as(c => c?.get_title() || "Desktop")
+	const label = rawTitle.as(t => truncate(t, TITLE_MAX_LENGTH))
+	const className = rawTitle.as(t => hasTallGlyphs(t) ? "window-title compact" : "window-title")
+	return <label class={className} label={label} />
 }
 
 function initHourSegments(container: Gtk.Box, hourPoll: ReturnType<typeof createPoll<number>>) {

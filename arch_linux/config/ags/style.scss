@@ -78,7 +78,14 @@ window.Bar {
     // Powerline segments
     .userhost { @include powerline-segment($accent-blue); }
     .workspaces { background: $accent-yellow; }
-    .window-title { @include powerline-segment($accent-red); }
+    .window-title {
+      @include powerline-segment($accent-red);
+
+      // Triggered when the title contains glyphs Pango would render via a
+      // fallback font (emoji/CJK/etc.). Shrinks the whole label so the
+      // fallback's line-height fits within the bar's normal envelope.
+      &.compact { font-size: 0.9em; }
+    }
 
     // Workspace buttons
     .workspace {
@@ -265,6 +272,9 @@ window.Bar {
       color: $dark-bg;
       padding: 0 4px;
       min-height: 0;
+
+      // See `.window-title.compact` — same rationale for the media label.
+      &.compact { font-size: 0.9em; }
     }
   }
 

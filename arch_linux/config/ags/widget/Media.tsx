@@ -2,7 +2,7 @@ import { Gtk } from "ags/gtk4"
 import { createExternal, createState, createComputed } from "ags"
 import Mpris from "gi://AstalMpris"
 import { LEFT_TRIANGLE } from "../constants"
-import { truncate } from "../util"
+import { truncate, hasTallGlyphs } from "../util"
 
 const MEDIA_MAX_LENGTH = 40
 
@@ -75,6 +75,9 @@ export function Media() {
   const playPauseIcon = createComputed(() =>
     playbackStatus() === Mpris.PlaybackStatus.PLAYING ? "󰏤" : "󰐊"
   )
+  const mediaTextClass = createComputed(() =>
+    hasTallGlyphs(displayText()) ? "media-text compact" : "media-text"
+  )
 
   return (
     <box class="media-container" visible={mediaVisible} valign={Gtk.Align.START}>
@@ -99,7 +102,7 @@ export function Media() {
       >
         <label label="󰒭" />
       </button>
-      <label class="media-text" label={displayText} />
+      <label class={mediaTextClass} label={displayText} />
     </box>
   )
 }
