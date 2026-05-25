@@ -311,13 +311,18 @@ window.Bar {
       min-height: 0;
       min-width: 0;
 
-      &:hover label {
-        opacity: 0.8;
+      // Icons are Gtk.Image (mirror of .volume-button) so the buttons have a
+      // fixed-pixel size and don't push the bar height around the way a Nerd
+      // Font label did.
+      image {
+        -gtk-icon-size: 16px;
+        min-width: 16px;
+        min-height: 16px;
+        color: $dark-bg;
       }
 
-      label {
-        color: $dark-bg;
-        min-height: 0;
+      &:hover image {
+        opacity: 0.8;
       }
     }
 

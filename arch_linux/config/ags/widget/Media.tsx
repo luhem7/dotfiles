@@ -138,10 +138,32 @@ export function initProgressBar(self: Gtk.Box) {
   progress.subscribe(() => apply(progress.get()))
 }
 
+function initStaticIcon(name: string) {
+  return (button: Gtk.Button) => {
+    const icon = new Gtk.Image()
+    icon.set_from_icon_name(name)
+    icon.set_pixel_size(16)
+    button.set_child(icon)
+  }
+}
+
+function initPlayPauseIcon(button: Gtk.Button) {
+  const icon = new Gtk.Image()
+  icon.set_pixel_size(16)
+  button.set_child(icon)
+
+  const apply = () => {
+    icon.set_from_icon_name(
+      playbackStatus() === Mpris.PlaybackStatus.PLAYING
+        ? "media-playback-pause-symbolic"
+        : "media-playback-start-symbolic"
+    )
+  }
+  apply()
+  playbackStatus.subscribe(apply)
+}
+
 export function Media() {
-  const playPauseIcon = createComputed(() =>
-    playbackStatus() === Mpris.PlaybackStatus.PLAYING ? "󰏤" : "󰐊"
-  )
   const mediaTextClass = createComputed(() =>
     hasTallGlyphs(displayText()) ? "media-text compact" : "media-text"
   )
@@ -153,22 +175,19 @@ export function Media() {
         class="media-button"
         visible={canPrev}
         onClicked={() => activePlayer()?.previous()}
-      >
-        <label label="󰒮" />
-      </button>
+        onRealize={initStaticIcon("media-skip-backward-symbolic")}
+      />
       <button
         class="media-button"
         onClicked={() => activePlayer()?.play_pause()}
-      >
-        <label label={playPauseIcon} />
-      </button>
+        onRealize={initPlayPauseIcon}
+      />
       <button
         class="media-button"
         visible={canNext}
         onClicked={() => activePlayer()?.next()}
-      >
-        <label label="󰒭" />
-      </button>
+        onRealize={initStaticIcon("media-skip-forward-symbolic")}
+      />
       <label class={mediaTextClass} label={displayText} />
     </box>
   )
