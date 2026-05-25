@@ -248,7 +248,9 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 							<Media />
 							<label class="chevron" name="tray-chevron-left" valign={Gtk.Align.CENTER} label={LEFT_TRIANGLE} />
 						</box>
-						<box class="media-progress" visible={progressVisible} onRealize={initProgressBar} />
+						<box class="media-progress" visible={progressVisible} onRealize={initProgressBar}>
+							<box class="media-progress-cap" />
+						</box>
 					</box>
 					<box class="tray-container" valign={Gtk.Align.START}>
 						<Speaker />

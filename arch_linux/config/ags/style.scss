@@ -175,7 +175,18 @@ window.Bar {
       // Skip the dark-bg left media-chevron at the start of the row; the
       // right edge naturally extends under the tray-chevron-left since both
       // live in this wrapper.
-      margin: 0 0 0 10px;
+      margin: 0 0 0 9px;
+
+      // 3×3px wedge at the bar's left start. The diagonal gradient paints the
+      // bottom-left half with $dark-bg (covering the parent's gradient there)
+      // and leaves the top-right half transparent (revealing the bar's red).
+      // Net silhouette: the bar's left edge slants 45° from top-left down to
+      // bottom-right, visually continuing the chevron's left-pointing slant.
+      .media-progress-cap {
+        min-width: 3px;
+        min-height: 3px;
+        background: linear-gradient(45deg, $dark-bg 50%, transparent 50%);
+      }
 
       &.shimmer {
         background: linear-gradient(
