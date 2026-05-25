@@ -1,6 +1,6 @@
 import { Gtk } from "ags/gtk4"
 import { createExternal, createState, createComputed } from "ags"
-import { createPoll } from "ags/time"
+import GLib from "gi://GLib"
 import Mpris from "gi://AstalMpris"
 import { LEFT_TRIANGLE } from "../constants"
 import { truncate, hasTallGlyphs } from "../util"
@@ -78,29 +78,45 @@ type ProgressSnapshot = {
   fraction: number
 }
 
-// Brute-force: re-read position/length/status from the active player every
-// PROGRESS_POLL_MS. Keeps the implementation trivial — no baseline math, no
-// signal handlers to keep in sync.
-const progress = createPoll<ProgressSnapshot>(
-  { mode: "hidden", fraction: 0 },
-  PROGRESS_POLL_MS,
-  () => {
-    const p = pickPlayer()
-    if (!p) return { mode: "hidden", fraction: 0 }
-    const length = p.length ?? 0
-    const position = p.position ?? 0
-    if (length > 0) {
-      return {
-        mode: "determinate",
-        fraction: Math.max(0, Math.min(1, position / length)),
-      }
+function computeProgress(): ProgressSnapshot {
+  const p = pickPlayer()
+  if (!p) return { mode: "hidden", fraction: 0 }
+  const length = p.length ?? 0
+  const position = p.position ?? 0
+  if (length > 0) {
+    return {
+      mode: "determinate",
+      fraction: Math.max(0, Math.min(1, position / length)),
     }
-    if (p.playback_status === Mpris.PlaybackStatus.PLAYING) {
-      return { mode: "indeterminate", fraction: 0 }
-    }
-    return { mode: "hidden", fraction: 0 }
   }
-)
+  if (p.playback_status === Mpris.PlaybackStatus.PLAYING) {
+    return { mode: "indeterminate", fraction: 0 }
+  }
+  return { mode: "hidden", fraction: 0 }
+}
+
+// Brute-force: re-read position/length/status from the active player every
+// PROGRESS_POLL_MS. Click handlers can also call syncProgress() directly to
+// avoid the visual lag between a button press and the next poll tick.
+const [progress, setProgress] = createState<ProgressSnapshot>(computeProgress())
+function syncProgress() { setProgress(computeProgress()) }
+
+// MPRIS actions (play_pause/next/previous) are async D-Bus calls. An immediate
+// sync usually reads pre-action state, so we also schedule a follow-up sync
+// after a short delay to catch the post-action state.
+const POST_CLICK_SYNC_MS = 50
+function syncProgressAfterClick() {
+  syncProgress()
+  GLib.timeout_add(GLib.PRIORITY_DEFAULT, POST_CLICK_SYNC_MS, () => {
+    syncProgress()
+    return GLib.SOURCE_REMOVE
+  })
+}
+
+GLib.timeout_add(GLib.PRIORITY_DEFAULT, PROGRESS_POLL_MS, () => {
+  syncProgress()
+  return GLib.SOURCE_CONTINUE
+})
 
 export const progressVisible = createComputed(() => progress().mode !== "hidden")
 
@@ -134,8 +150,8 @@ export function initProgressBar(self: Gtk.Box) {
     }
   }
 
-  apply(progress.get())
-  progress.subscribe(() => apply(progress.get()))
+  apply(progress())
+  progress.subscribe(() => apply(progress()))
 }
 
 function initStaticIcon(name: string) {
@@ -174,18 +190,18 @@ export function Media() {
       <button
         class="media-button"
         visible={canPrev}
-        onClicked={() => activePlayer()?.previous()}
+        onClicked={() => { activePlayer()?.previous(); syncProgressAfterClick() }}
         onRealize={initStaticIcon("media-skip-backward-symbolic")}
       />
       <button
         class="media-button"
-        onClicked={() => activePlayer()?.play_pause()}
+        onClicked={() => { activePlayer()?.play_pause(); syncProgressAfterClick() }}
         onRealize={initPlayPauseIcon}
       />
       <button
         class="media-button"
         visible={canNext}
-        onClicked={() => activePlayer()?.next()}
+        onClicked={() => { activePlayer()?.next(); syncProgressAfterClick() }}
         onRealize={initStaticIcon("media-skip-forward-symbolic")}
       />
       <label class={mediaTextClass} label={displayText} />
