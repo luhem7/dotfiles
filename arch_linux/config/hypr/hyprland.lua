@@ -151,23 +151,28 @@ hl.curve("linear",         { type = "bezier", points = { {0, 0},       {1, 1}   
 hl.curve("almostLinear",   { type = "bezier", points = { {0.5, 0.5},   {0.75, 1} } })
 hl.curve("quick",          { type = "bezier", points = { {0.15, 0},    {0.1, 1}  } })
 
-hl.animation({ leaf = "global",        enabled = true, speed = 10,   bezier = "default" })
-hl.animation({ leaf = "border",        enabled = true, speed = 5.39, bezier = "easeOutQuint" })
-hl.animation({ leaf = "windows",       enabled = true, speed = 4.79, bezier = "easeOutQuint" })
-hl.animation({ leaf = "windowsIn",     enabled = true, speed = 4.1,  bezier = "easeOutQuint",  style = "popin 87%" })
-hl.animation({ leaf = "windowsOut",    enabled = true, speed = 1.49, bezier = "linear",        style = "popin 87%" })
-hl.animation({ leaf = "fadeIn",        enabled = true, speed = 1.73, bezier = "almostLinear" })
-hl.animation({ leaf = "fadeOut",       enabled = true, speed = 1.46, bezier = "almostLinear" })
-hl.animation({ leaf = "fade",          enabled = true, speed = 3.03, bezier = "quick" })
-hl.animation({ leaf = "layers",        enabled = true, speed = 3.81, bezier = "easeOutQuint" })
-hl.animation({ leaf = "layersIn",      enabled = true, speed = 4,    bezier = "easeOutQuint",  style = "fade" })
-hl.animation({ leaf = "layersOut",     enabled = true, speed = 1.5,  bezier = "linear",        style = "fade" })
-hl.animation({ leaf = "fadeLayersIn",  enabled = true, speed = 1.79, bezier = "almostLinear" })
-hl.animation({ leaf = "fadeLayersOut", enabled = true, speed = 1.39, bezier = "almostLinear" })
-hl.animation({ leaf = "workspaces",    enabled = true, speed = 1.94, bezier = "almostLinear",  style = "fade" })
-hl.animation({ leaf = "workspacesIn",  enabled = true, speed = 1.21, bezier = "almostLinear",  style = "fade" })
-hl.animation({ leaf = "workspacesOut", enabled = true, speed = 1.94, bezier = "almostLinear",  style = "fade" })
-hl.animation({ leaf = "zoomFactor",    enabled = true, speed = 7,    bezier = "quick" })
+for _, a in ipairs({
+    -- leaf,           speed, bezier,           style (optional)
+    { "global",        10,    "default" },
+    { "border",        5.39,  "easeOutQuint" },
+    { "windows",       4.79,  "easeOutQuint" },
+    { "windowsIn",     4.1,   "easeOutQuint",   "popin 87%" },
+    { "windowsOut",    1.49,  "linear",         "popin 87%" },
+    { "fadeIn",        1.73,  "almostLinear" },
+    { "fadeOut",       1.46,  "almostLinear" },
+    { "fade",          3.03,  "quick" },
+    { "layers",        3.81,  "easeOutQuint" },
+    { "layersIn",      4,     "easeOutQuint",   "fade" },
+    { "layersOut",     1.5,   "linear",         "fade" },
+    { "fadeLayersIn",  1.79,  "almostLinear" },
+    { "fadeLayersOut", 1.39,  "almostLinear" },
+    { "workspaces",    1.94,  "almostLinear",   "fade" },
+    { "workspacesIn",  1.21,  "almostLinear",   "fade" },
+    { "workspacesOut", 1.94,  "almostLinear",   "fade" },
+    { "zoomFactor",    7,     "quick" },
+}) do
+    hl.animation({ leaf = a[1], enabled = true, speed = a[2], bezier = a[3], style = a[4] })
+end
 
 -- Ref https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/
 -- "Smart gaps" / "No gaps when only"
@@ -255,62 +260,66 @@ hl.device({
 -- See https://wiki.hypr.land/Configuring/Basics/Binds/
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
+local function bind(keys, action, opts)  hl.bind(mainMod .. " + " .. keys, action, opts) end
+local function sbind(keys, action, opts) hl.bind(mainMod .. " + SHIFT + " .. keys, action, opts) end
+
 -- Top level / System level commands
-hl.bind(mainMod ..           " + Escape", hl.dsp.exec_cmd(lockmgr))
-hl.bind(mainMod .. " + SHIFT + Escape",   hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
-hl.bind(mainMod .. " + SHIFT + S",        hl.dsp.window.move({ workspace = 10 }))
-hl.bind(mainMod ..           " + T",      hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod ..           " + Q",      hl.dsp.window.close())
-hl.bind(mainMod .. " + SHIFT + Q",        hl.dsp.exec_cmd("hyprctl kill"))
-hl.bind(mainMod ..           " + M",      hl.dsp.exit())
-hl.bind(mainMod ..           " + F",      hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod ..           " + W",      hl.dsp.exec_cmd(webBrowser))
-hl.bind(mainMod ..           " + V",      hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod ..           " + Space",  hl.dsp.exec_cmd(menu))
-hl.bind(mainMod ..           " + P",      hl.dsp.window.pseudo())                 -- dwindle
-hl.bind(mainMod ..           " + J",      hl.dsp.layout("togglesplit"))           -- dwindle
-hl.bind(mainMod ..           " + Print",  hl.dsp.exec_cmd("hyprshot -m region --clipboard-only"))
-hl.bind(mainMod .. " + SHIFT + Print",    hl.dsp.exec_cmd("bash -c 'hyprshot -m output -o ~ -f screenshot_$(date +%Y-%m-%dT%H-%M-%S).jpg'"))
+bind ("Escape",   hl.dsp.exec_cmd(lockmgr))
+sbind("Escape",   hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
+sbind("S",        hl.dsp.window.move({ workspace = 10 }))
+bind ("T",        hl.dsp.exec_cmd(terminal))
+bind ("Q",        hl.dsp.window.close())
+sbind("Q",        hl.dsp.exec_cmd("hyprctl kill"))
+bind ("M",        hl.dsp.exit())
+bind ("F",        hl.dsp.exec_cmd(fileManager))
+bind ("W",        hl.dsp.exec_cmd(webBrowser))
+bind ("V",        hl.dsp.window.float({ action = "toggle" }))
+bind ("Space",    hl.dsp.exec_cmd(menu))
+bind ("P",        hl.dsp.window.pseudo())        -- dwindle
+bind ("J",        hl.dsp.layout("togglesplit"))  -- dwindle
+bind ("Print",    hl.dsp.exec_cmd("hyprshot -m region --clipboard-only"))
+sbind("Print",    hl.dsp.exec_cmd("bash -c 'hyprshot -m output -o ~ -f screenshot_$(date +%Y-%m-%dT%H-%M-%S).jpg'"))
 
 -- Move focus with mainMod + arrow keys
-hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
-hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
-hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
-hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
+for _, dir in ipairs({ "left", "right", "up", "down" }) do
+    bind(dir, hl.dsp.focus({ direction = dir }))
+end
 
 -- Switch workspaces with mainMod + [0-9]
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]
 for i = 1, 10 do
-    local key = i % 10 -- 10 maps to key 0
-    hl.bind(mainMod ..           " + " .. key, hl.dsp.focus({ workspace = i }))
-    hl.bind(mainMod .. " + SHIFT + " .. key,   hl.dsp.window.move({ workspace = i }))
+    local key = tostring(i % 10) -- 10 maps to key 0
+    bind (key, hl.dsp.focus({ workspace = i }))
+    sbind(key, hl.dsp.window.move({ workspace = i }))
 end
 
 -- Special workspace (scratchpad)
-hl.bind(mainMod ..           " + grave", hl.dsp.workspace.toggle_special("magic"))
-hl.bind(mainMod .. " + SHIFT + grave",   hl.dsp.window.move({ workspace = "special:magic" }))
+bind ("grave", hl.dsp.workspace.toggle_special("magic"))
+sbind("grave", hl.dsp.window.move({ workspace = "special:magic" }))
 
 -- Scroll through existing workspaces with mainMod + scroll
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
-hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
+bind("mouse_down", hl.dsp.focus({ workspace = "e+1" }))
+bind("mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 
 -- Move/resize windows with mainMod + LMB/RMB and dragging
-hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
-hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+bind("mouse:272", hl.dsp.window.drag(),   { mouse = true })
+bind("mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- Laptop multimedia keys for volume and LCD brightness
-hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
-hl.bind("XF86AudioMute",         hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/audio-mute-toggle.sh"), { locked = true, repeating = true })
-hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
+local repeat_locked = { locked = true, repeating = true }
+hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),            repeat_locked)
+hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),                 repeat_locked)
+hl.bind("XF86AudioMute",         hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/audio-mute-toggle.sh"),     repeat_locked)
+hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),              repeat_locked)
+hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                             repeat_locked)
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                             repeat_locked)
 
 -- Requires playerctl
-hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
+local locked = { locked = true }
+hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       locked)
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), locked)
+hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), locked)
+hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   locked)
 
 
 --------------------------------
