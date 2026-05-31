@@ -31,8 +31,8 @@ setopt PROMPT_SUBST         # Allow substitution in prompt
 # History
 # ---------------------
 HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
+HISTSIZE=50000
+SAVEHIST=50000
 
 setopt SHARE_HISTORY          # Share history between all sessions
 setopt HIST_IGNORE_DUPS       # Don't record duplicate entries
@@ -41,6 +41,15 @@ setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
 setopt HIST_REDUCE_BLANKS     # Remove unnecessary blanks
 setopt HIST_VERIFY            # Show command before executing from history
 setopt INC_APPEND_HISTORY     # Add commands immediately, not at shell exit
+
+# ---------------------
+# fzf integration
+# ---------------------
+# Binds Ctrl-R (fuzzy history search), Ctrl-T (files), Alt-C (cd into dir).
+# Requires fzf >= 0.48 (provides `fzf --zsh`). Install: sudo pacman -S fzf
+if command -v fzf &> /dev/null; then
+    source <(fzf --zsh)
+fi
 
 # ---------------------
 # Plugins (Arch packages)
