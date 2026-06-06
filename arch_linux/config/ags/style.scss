@@ -233,6 +233,26 @@ window.Bar {
         min-width: 16px;
         min-height: 16px;
       }
+
+      // Containers button uses a glyph + count label instead of a 16px symbolic
+      // image, so it renders at the bar's default text size and looks small next
+      // to the other icons. Bump it up to sit ~level with them. (panel-container's
+      // max-height: 28px keeps this from growing the bar.)
+      label {
+        color: $dark-bg;
+        font-size: 1.2em;
+      }
+
+      &:hover label {
+        opacity: 0.8;
+      }
+
+      // Set the container indicator slightly apart from the icon trio so the
+      // glyph + count read as their own widget rather than trailing the row.
+      // The gap shows the dark panel behind the tray, powerline-style.
+      // &.containers {
+      //  margin: 0 5px;
+      //}
     }
 
     .systray {
@@ -414,4 +434,38 @@ window.Bar {
 @keyframes media-shimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+// =============================================================================
+// Containers hover table (custom tooltip widget)
+// =============================================================================
+// Top-level: GTK renders tooltips in their own window, not under window.Bar, so
+// these selectors must live at root scope to reach the custom grid widget.
+.container-tooltip {
+  padding: 2px 4px;
+
+  .c-header {
+    color: color.adjust($highlight, $alpha: -0.45);
+    font-size: 0.85em;
+    padding-bottom: 2px;
+  }
+
+  .c-name {
+    color: $highlight;
+    font-weight: bold;
+  }
+
+  .c-meta {
+    color: color.adjust($highlight, $alpha: -0.25);
+  }
+
+  .state-dot {
+    font-size: 0.8em;
+
+    &.state-running { color: $accent-green; }
+    &.state-starting { color: $accent-yellow; }
+    &.state-paused { color: $accent-blue; }
+    &.state-unhealthy { color: $accent-red; }
+    &.state-other { color: $off-focus; }
+  }
 }

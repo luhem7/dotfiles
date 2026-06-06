@@ -10,6 +10,7 @@ import { getSunTimes, getHourBrightness, brightnessToColor } from "../sun"
 import { SysTray } from "./Tray"
 import { Speaker, Microphone } from "./Volume"
 import { Screenshot } from "./Screenshot"
+import { Containers } from "./Containers"
 import { LEFT_TRIANGLE, RIGHT_TRIANGLE } from "../constants"
 import { truncate, hasTallGlyphs } from "../util"
 import { Media, mediaVisible, progressVisible, initProgressBar } from "./Media"
@@ -256,6 +257,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 						<Speaker />
 						<Microphone />
 						<Screenshot />
+						<Containers />
 						<SysTray />
 					</box>
 					<menubutton class="clock">
