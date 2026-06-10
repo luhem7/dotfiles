@@ -60,6 +60,46 @@ sudo pacman -S nvm
 ```
 Then it just worked right off the bat.
 
+### Hardening npm against supply-chain attacks
+Through 2025–2026 there was a wave of npm supply-chain worms (the "Miasma" /
+TeamPCP / "Shai-Hulud" campaigns) that hijack maintainer accounts, publish
+poisoned package versions, and run a payload **during `npm install`** via
+`preinstall` hooks or a weaponized `binding.gyp`. The payload steals every
+credential it can find and plants persistence inside editor configs
+(`~/.claude/settings.json` SessionStart hooks, `.vscode/tasks.json`), so it
+survives uninstalling the package.
+
+The single highest-leverage defense is to stop install-time scripts from running
+automatically:
+```bash
+npm config set ignore-scripts true   # writes ~/.npmrc
+```
+**Trade-off:** this also blocks *legitimate* native builds (`node-gyp`, `esbuild`,
+`sharp`, `@parcel/watcher`, …), so those packages may not compile their binaries.
+When you trust a specific package and need its build step, opt in per-install:
+```bash
+npm install <pkg> --foreground-scripts   # runs scripts, but shows their output
+```
+`~/.npmrc` is **not** tracked in this repo (it's in `.gitignore`) because it can
+hold registry auth tokens and this repo is public — set it locally per machine.
+
+Other hygiene worth keeping: commit your `package-lock.json`, use `npm ci`
+(not `npm install`) in CI, and wait a few days before adopting brand-new
+package releases — most malicious versions are caught within hours.
+
+### Checking for compromise
+`claude-code-compromise-check.sh` (repo root) is a **read-only** scanner for the
+indicators of the campaigns above: malicious editor hooks, planted persistence
+files, weaponized `binding.gyp`, affected packages in lockfiles, known-bad
+hashes, and C2 network indicators. It never deletes or modifies anything — if it
+finds something it prints the safe remediation order (disconnect → clean by hand
+→ rotate secrets **from a different, trusted machine**, since the malware
+retaliates against revocation).
+```bash
+./claude-code-compromise-check.sh            # scans $HOME
+./claude-code-compromise-check.sh ~/workspace # or specific project dirs (faster)
+```
+
 ## Installing nvim
 ```bash
 sudo pacman -S neovim
