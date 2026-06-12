@@ -26,3 +26,7 @@ end
 
 -- Keybindings
 vim.keymap.set('n', '<leader>rs', ':source $MYVIMRC | echo "Config reloaded!"<CR>', { desc = 'Reload System Config' })
+
+-- Toggle comments via Neovim's built-in commenting (gc/gcc)
+vim.keymap.set('n', '<leader>/', 'gcc', { remap = true, desc = 'Toggle comment' })
+vim.keymap.set('x', '<leader>/', 'gc', { remap = true, desc = 'Toggle comment' })
