@@ -13,7 +13,7 @@ return {
       })
     end,
     -- To install parsers, run once manually:
-    -- :TSInstall html css javascript typescript tsx json python rust toml lua bash markdown yaml
+    -- :TSInstall html css javascript typescript tsx json python rust toml lua bash markdown markdown_inline yaml latex
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
