@@ -118,6 +118,30 @@ Needed for nvim's `unnamedplus` clipboard integration to share yanks with the Wa
 sudo pacman -S wl-clipboard
 ```
 
+### Markdown rendering (render-markdown.nvim)
+The `render-markdown.nvim` plugin renders Markdown directly in the buffer. LaTeX math rendering needs a converter to turn formulas into unicode:
+```bash
+sudo pacman -S python-pylatexenc
+```
+It also relies on a few treesitter parsers — install them once from inside nvim:
+```vim
+:TSInstall markdown markdown_inline latex html yaml
+```
+
+### Completion and language servers
+Completion comes from `blink.cmp`, which compiles a Rust fuzzy matcher on install (see [Installing Rust](#installing-rust) below — without it, blink warns once and falls back to a slower pure-Lua matcher).
+
+The intelligence (autocomplete, diagnostics, go-to-definition) comes from language servers. Install the ones for languages you actually use — the nvim config only enables servers whose binary is present on PATH, so a partial install (or a different machine) won't produce errors.
+```bash
+sudo pacman -S lua-language-server rust-analyzer pyright \
+               typescript-language-server typescript \
+               bash-language-server shellcheck shfmt
+```
+`shellcheck` and `shfmt` back the bash server's diagnostics and formatting. The HTML, CSS, and JSON servers ship together in a single AUR package:
+```bash
+yay -S vscode-langservers-extracted
+```
+
 ## Installing Rust
 Instructions [here](https://wiki.archlinux.org/title/Rust). I went ahead and installed rustup:
 ```bash

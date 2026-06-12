@@ -10,10 +10,9 @@ return {
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
-      -- 'default': built-in-like keys. <C-y> accept, <C-space> open menu/docs,
-      -- <C-n>/<C-p> navigate, <C-e> hide, <C-k> toggle signature help.
-      -- Swap to 'super-tab' if you'd rather press <Tab> to accept (VSCode-style).
-      keymap = { preset = "default" },
+      -- 'super-tab': VSCode-style, <Tab> accepts the current selection.
+      -- <C-space> open menu/docs, <C-n>/<C-p> navigate, <C-e> hide.
+      keymap = { preset = "super-tab" },
       appearance = {
         -- JetBrainsMono Nerd Font is the system monospace font.
         nerd_font_variant = "mono",
