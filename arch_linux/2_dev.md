@@ -118,6 +118,17 @@ Needed for nvim's `unnamedplus` clipboard integration to share yanks with the Wa
 sudo pacman -S wl-clipboard
 ```
 
+## Installing Rust
+Instructions [here](https://wiki.archlinux.org/title/Rust). I went ahead and installed rustup:
+```bash
+sudo pacman -S rustup
+```
+and then installed the latest stable rust toolchain (includes cargo):
+```bash
+rustup toolchain install stable
+```
+
+
 ## Useful packages
 
 ### lsd
