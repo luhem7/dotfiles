@@ -25,6 +25,11 @@ return {
       anti_conceal = {
         enabled = true,
       },
+      -- Surface checkbox/callout suggestions through the completion engine
+      -- (blink.cmp), via in-process LSP. Works automatically once blink is set up.
+      completions = {
+        lsp = { enabled = true },
+      },
     },
     keys = {
       { "<leader>mt", "<cmd>RenderMarkdown toggle<cr>", desc = "Markdown toggle render", ft = "markdown" },
