@@ -88,16 +88,20 @@ Other hygiene worth keeping: commit your `package-lock.json`, use `npm ci`
 package releases — most malicious versions are caught within hours.
 
 ### Checking for compromise
-`claude-code-compromise-check.sh` (repo root) is a **read-only** scanner for the
+`npm-supply-chain-scanner.sh` (repo root) is a **read-only** scanner for the
 indicators of the campaigns above: malicious editor hooks, planted persistence
 files, weaponized `binding.gyp`, affected packages in lockfiles, known-bad
-hashes, and C2 network indicators. It never deletes or modifies anything — if it
-finds something it prints the safe remediation order (disconnect → clean by hand
-→ rotate secrets **from a different, trusted machine**, since the malware
-retaliates against revocation).
+hashes, and C2 network indicators. It also covers the **Atomic Arch** AUR
+campaign (pacman history, yay/paru build caches, eBPF rootkit maps, systemd
+persistence) and sweeps the nvim (lazy.nvim) plugin tree for the same IOCs. It
+never deletes or modifies anything — if it finds something it prints the safe
+remediation order (disconnect → clean by hand → rotate secrets **from a
+different, trusted machine**, since the malware retaliates against revocation).
 ```bash
-./claude-code-compromise-check.sh            # scans $HOME
-./claude-code-compromise-check.sh ~/workspace # or specific project dirs (faster)
+./npm-supply-chain-scanner.sh            # scans $HOME
+./npm-supply-chain-scanner.sh ~/workspace # or specific project dirs (faster)
+sudo HOME="$HOME" ./npm-supply-chain-scanner.sh  # full coverage (/sys/fs/bpf) while keeping your caches in scope
+./npm-supply-chain-scanner.sh --preview-aur  # diff pending AUR upgrades BEFORE yay -Syu
 ```
 
 ## Installing nvim

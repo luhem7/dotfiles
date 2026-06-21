@@ -22,7 +22,7 @@ Personal dotfiles for an Arch Linux environment with Hyprland (Wayland), Neovim,
 
 ## Repository Structure
 
-- **Root level**: Shell configs (`.zshrc`, `.zsh_linux.zsh`, `.zsh_macos.zsh`), terminal config (`.wezterm.lua`), git config, plus the `manage_dotfiles.sh`, `hypr-binds`, `commit-push-changes.sh`, and `claude-code-compromise-check.sh` (read-only npm supply-chain / Claude Code backdoor scanner) helpers
+- **Root level**: Shell configs (`.zshrc`, `.zsh_linux.zsh`, `.zsh_macos.zsh`), terminal config (`.wezterm.lua`), git config, plus the `manage_dotfiles.sh`, `hypr-binds`, `commit-push-changes.sh`, and `npm-supply-chain-scanner.sh` (read-only scanner for npm / Claude Code backdoors and the Atomic Arch AUR campaign, incl. nvim plugin sweep and a `--preview-aur` pre-upgrade PKGBUILD diff check) helpers
 - **`vscode/`**: VSCode `settings.json`
 - **`arch_linux/`**: Numbered setup guides plus all Arch-specific configs, polkit rules, kernel params, and utility scripts. See guide breakdown below.
 

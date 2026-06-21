@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# claude-code-compromise-check.sh
+# npm-supply-chain-scanner.sh
 # -------------------------------
 # Read-only detector for the June 2026 "Miasma" / TeamPCP npm supply-chain
 # campaign and related Claude Code SessionStart-hook backdoors (incl. the
@@ -22,10 +22,16 @@
 # persistence by hand -> ROTATE every secret FROM A DIFFERENT, TRUSTED MACHINE.
 #
 # Usage:
-#   ./claude-code-compromise-check.sh [SCAN_ROOT ...]
+#   ./npm-supply-chain-scanner.sh [SCAN_ROOT ...]
 # Defaults to scanning $HOME if no roots are given. Pass specific project dirs
 # to scan faster, e.g.:
-#   ./claude-code-compromise-check.sh ~/workspace ~/projects
+#   ./npm-supply-chain-scanner.sh ~/workspace ~/projects
+#
+#   ./npm-supply-chain-scanner.sh --preview-aur
+# AUR upgrade preview: BEFORE you run `yay -Syu`, fetch (no build, no upgrade)
+# the incoming AUR changes for every package with a pending update and scan the
+# DIFF for campaign patterns — so a weaponized PKGBUILD is caught before it ever
+# builds. Read-only: only `git fetch` + `git diff`, never makepkg.
 #
 # Exit codes: 0 = nothing found, 1 = REVIEW items only, 2 = HIGH-severity hit.
 #
@@ -37,8 +43,14 @@
 set -uo pipefail
 
 # ---------------------------------------------------------------------------
-# Scan roots
+# Mode + scan roots
 # ---------------------------------------------------------------------------
+# --preview-aur runs the pre-upgrade AUR diff preview instead of the full scan.
+PREVIEW_MODE=0
+case "${1:-}" in
+  --preview-aur|--aur-preview|preview) PREVIEW_MODE=1; shift ;;
+esac
+
 if [ "$#" -gt 0 ]; then
   SCAN_ROOTS=("$@")
 else
@@ -187,15 +199,154 @@ check_aur_hash() {
   fi
 }
 
+# scan_incoming <pkg> <text> -> grade the incoming AUR code (diff added-lines, or
+# a whole new PKGBUILD) for campaign patterns. Returns the number of findings it
+# raised so the caller can tally which packages are flagged.
+scan_incoming() {
+  local pkg="$1" text="$2" n=0 ioc
+  # HIGH: hard IOCs that are never legitimate in a build file.
+  local hard=("$AUR_C2_ONION" "${AUR_NPM_PACKAGES[@]}" "${C2_DOMAINS[@]}" "${C2_IPS[@]}")
+  for ioc in "${hard[@]}"; do
+    if printf '%s' "$text" | grep -qF -- "$ioc"; then
+      high "[$pkg] incoming change introduces hard IOC: $ioc"; n=$((n+1))
+    fi
+  done
+  # HIGH: remote pipe-to-shell dropper.
+  if printf '%s' "$text" | grep -qE '(curl|wget)[^|]*\|[[:space:]]*(sh|bash)'; then
+    high "[$pkg] incoming change adds a curl/wget pipe-to-shell dropper"; n=$((n+1))
+  fi
+  # REVIEW: newly introduced JS package-manager install (verify the dependency).
+  if printf '%s' "$text" | grep -qE '(npm|pnpm|yarn|bun)[[:space:]]+(install|add|i)([[:space:]]|$)'; then
+    review "[$pkg] incoming change adds an npm/bun/yarn install step — verify the package"; n=$((n+1))
+  fi
+  # REVIEW: network fetch / base64 decode / eval — classic stager building blocks.
+  if printf '%s' "$text" | grep -qE 'base64[[:space:]]+(-d|--decode)|(^|[^[:alnum:]])(eval|curl|wget)([[:space:](])'; then
+    review "[$pkg] incoming change adds a network fetch / decode / eval — eyeball it"; n=$((n+1))
+  fi
+  # REVIEW: the source=() array changed — a new/altered upstream source.
+  if printf '%s' "$text" | grep -qE 'source[A-Za-z0-9_]*\+?=\('; then
+    review "[$pkg] incoming change modifies the source=() array — new upstream source"; n=$((n+1))
+  fi
+  return "$n"
+}
+
+# run_aur_preview: fetch (no build) the incoming AUR changes for every package
+# with a pending update and scan the diff BEFORE `yay -Syu` builds anything.
+run_aur_preview() {
+  section "AUR upgrade preview (read-only — no build, no upgrade performed)"
+  if ! command -v yay >/dev/null 2>&1; then
+    high "yay not found — cannot preview AUR upgrades on this machine."; return
+  fi
+  if ! command -v git >/dev/null 2>&1; then
+    high "git not found — required to diff incoming AUR changes."; return
+  fi
+
+  # yay's clone/build dir (default ~/.cache/yay; honor a configured buildDir).
+  local builddir="$HOME/.cache/yay"
+  if [ "$HAS_JQ" -eq 1 ] && [ -f "$HOME/.config/yay/config.json" ]; then
+    local bd; bd=$(jq -r '.buildDir // empty' "$HOME/.config/yay/config.json" 2>/dev/null)
+    [ -n "$bd" ] && [ -d "$bd" ] && builddir="$bd"
+  fi
+  note "AUR build/clone dir: $builddir"
+
+  # Packages with a pending AUR update: `yay -Qua` -> "name oldver -> newver".
+  local updates; updates=$(yay -Qua 2>/dev/null)
+  if [ -z "$updates" ]; then
+    ok "No pending AUR updates — nothing to preview."; return
+  fi
+
+  local npkgs=0 flagged=0
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    local pkg; pkg=$(printf '%s' "$line" | awk '{print $1}')
+    [ -z "$pkg" ] && continue
+    npkgs=$((npkgs+1))
+    local dir="$builddir/$pkg" tmp="" text="" from_clone=0
+
+    if [ -d "$dir/.git" ]; then
+      from_clone=1
+      # Fetch incoming commits WITHOUT merging or checkout — the working tree and
+      # a later real `yay -Syu` are left untouched; we only read origin's tip.
+      if git -C "$dir" fetch --quiet origin 2>/dev/null; then
+        local diff
+        diff=$(git -C "$dir" diff --no-color HEAD..FETCH_HEAD -- PKGBUILD '*.install' '*.sh' 2>/dev/null)
+        # Scan only the added lines (the incoming code), not removals/context.
+        text=$(printf '%s\n' "$diff" | grep -E '^\+' | grep -vE '^\+\+\+')
+      else
+        review "[$pkg] could not fetch incoming AUR changes (offline?) — verify manually"
+        flagged=$((flagged+1)); continue
+      fi
+    else
+      # No local clone to diff against — shallow-clone to a temp dir and treat the
+      # whole new PKGBUILD as "incoming" (no delta available, so scan wholesale).
+      tmp=$(mktemp -d)
+      if git clone --quiet --depth 1 "https://aur.archlinux.org/${pkg}.git" "$tmp/$pkg" 2>/dev/null; then
+        text=$(cat "$tmp/$pkg/PKGBUILD" "$tmp/$pkg"/*.install 2>/dev/null)
+      fi
+    fi
+
+    if [ -z "$text" ]; then
+      [ -n "$tmp" ] && rm -rf "$tmp"
+      note "[$pkg] no readable incoming change to scan (already current locally?)."
+      continue
+    fi
+
+    # scan_incoming returns its finding count as exit status: 0 == clean.
+    if ! scan_incoming "$pkg" "$text"; then
+      flagged=$((flagged+1))
+      if [ "$from_clone" -eq 1 ]; then
+        note "    full diff: git -C $dir diff HEAD..FETCH_HEAD"
+      else
+        note "    inspect: yay -G $pkg   (then read the fetched PKGBUILD)"
+      fi
+    fi
+    [ -n "$tmp" ] && rm -rf "$tmp"
+  done < <(printf '%s\n' "$updates")
+
+  if [ "$flagged" -eq 0 ]; then
+    ok "Previewed $npkgs pending AUR update(s) — no campaign patterns in incoming changes."
+  else
+    note "Previewed $npkgs update(s); $flagged had suspicious incoming changes (above)."
+  fi
+}
+
 # ---------------------------------------------------------------------------
 section "Scan configuration"
 # ---------------------------------------------------------------------------
-note "Scan roots: ${SCAN_ROOTS[*]}"
+if [ "$PREVIEW_MODE" -eq 1 ]; then
+  note "Mode: AUR upgrade preview (no build, no upgrade performed)."
+else
+  note "Scan roots: ${SCAN_ROOTS[*]}"
+fi
 HAS_JQ=0; command -v jq >/dev/null 2>&1 && HAS_JQ=1
 [ "$HAS_JQ" -eq 1 ] && note "jq found — using structured JSON parsing for hooks." \
                     || note "jq NOT found — falling back to text matching for hooks."
-[ "$(id -u)" -ne 0 ] && note "Not root — Atomic Arch system checks (/sys/fs/bpf, some units) are partial; re-run with sudo for full coverage."
+[ "$PREVIEW_MODE" -eq 0 ] && [ "$(id -u)" -ne 0 ] && note "Not root — Atomic Arch system checks (/sys/fs/bpf, some units) are partial; re-run with sudo for full coverage."
 build_prune
+
+# ---------------------------------------------------------------------------
+# AUR upgrade preview mode short-circuits the full scan: do the diff preview,
+# print a verdict, and exit. No filesystem scan is performed in this mode.
+# ---------------------------------------------------------------------------
+if [ "$PREVIEW_MODE" -eq 1 ]; then
+  run_aur_preview
+  printf '\n'
+  section "Preview verdict"
+  printf '  %sHIGH-severity hits : %d%s\n' "$C_RED" "$HIGH_COUNT" "$C_RST"
+  printf '  %sItems to review    : %d%s\n' "$C_YEL" "$REVIEW_COUNT" "$C_RST"
+  if [ "$HIGH_COUNT" -gt 0 ]; then
+    printf '\n%s%s!! A pending AUR update carries a known-malicious pattern — DO NOT upgrade it. !!%s\n' "$C_RED" "$C_BLD" "$C_RST"
+    printf 'Upgrade only the clean packages (e.g. `yay -S <pkg>` individually), and report the flagged PKGBUILD.\n'
+    exit 2
+  elif [ "$REVIEW_COUNT" -gt 0 ]; then
+    printf '\n%sIncoming changes need a human eyeball before you upgrade (see [REVIEW] above).%s\n' "$C_YEL" "$C_RST"
+    printf 'Inspect each with the printed diff command; once satisfied, run your normal `yay -Syu`.\n'
+    exit 1
+  else
+    printf '\n%sIncoming AUR changes are clean of known patterns — still skim the diffs for anything odd.%s\n' "$C_GRN" "$C_RST"
+    exit 0
+  fi
+fi
 
 # ---------------------------------------------------------------------------
 section "1. Claude Code config & SessionStart hooks (persistence)"
