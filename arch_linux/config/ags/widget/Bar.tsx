@@ -10,6 +10,7 @@ import { getSunTimes, getHourBrightness, brightnessToColor } from "../sun"
 import { SysTray } from "./Tray"
 import { Speaker, Microphone } from "./Volume"
 import { Screenshot } from "./Screenshot"
+import { RecordingIndicator } from "./Recording"
 import { Containers } from "./Containers"
 import { LEFT_TRIANGLE, RIGHT_TRIANGLE } from "../constants"
 import { truncate, hasTallGlyphs } from "../util"
@@ -257,6 +258,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 						<Speaker />
 						<Microphone />
 						<Screenshot />
+						<RecordingIndicator />
 						<Containers />
 						<SysTray />
 					</box>

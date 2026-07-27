@@ -255,6 +255,31 @@ window.Bar {
       //}
     }
 
+    // Appears only while a recording is in progress (visible bound to isRecording).
+    // Sits on the same orange background as the icon trio; the red icon signals "recording".
+    .recording-button {
+      background: $accent-orange;
+      margin: 0;
+      padding: 0 4px;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      min-height: 0;
+      min-width: 0;
+
+      image {
+        -gtk-icon-size: 16px;
+        min-width: 16px;
+        min-height: 16px;
+        // A truer red than $accent-red (#EA6926, too orange on the orange bg).
+        color: #cc241d;
+      }
+
+      &:hover image {
+        opacity: 0.8;
+      }
+    }
+
     .systray {
       background: $accent-orange;
       margin: 0;
