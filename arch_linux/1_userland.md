@@ -178,6 +178,39 @@ If the service fails to start use the following command to check what failed `jo
 
 We can run `speaker-test -c 2 -l 1` to play a sound through the front stereo speakers to see if the settings are working.
 
+### `pipewire-alsa` — don't skip it, or ALSA-only apps break
+Installing `pipewire`, `pipewire-audio` and `pipewire-pulse` is *not* enough. Anything that talks raw ALSA rather than pulse will fail to open the default device:
+```
+speaker-test -D default
+  → Playback open error: -2,No such file or directory
+```
+...while `speaker-test -D pipewire` and `-D pulse` both work fine. That split is the tell: the sound stack is healthy, but ALSA's `default` PCM is pointing somewhere useless.
+
+The cause is a missing symlink. `pipewire-audio` ships the file that redirects ALSA's default at PipeWire:
+```
+/usr/share/alsa/alsa.conf.d/99-pipewire-default.conf   # defines pcm.!default { type pipewire }
+```
+but **ALSA only reads `/etc/alsa/conf.d/`**, and the symlink into that directory is owned by the separate `pipewire-alsa` package. Without it, `pcm.!default` is never defined and ALSA falls back to its built-in default of **card 0**.
+
+That fallback is the nasty part, because card 0 is whatever the kernel enumerated first — not necessarily anything that can play sound. On this machine:
+```bash
+cat /proc/asound/cards    # 0 = Logitech BRIO (the webcam!)
+ls /proc/asound/BRIO/     # pcm0c only — capture, no playback (pcm*p) at all
+aplay -l                  # card 0 isn't even listed as a playback device
+```
+So ALSA's `default` resolves to a capture-only webcam, and opening it for output returns `ENOENT`. The error message blames a missing file, which sends you hunting in entirely the wrong direction.
+
+The fix:
+```bash
+sudo pacman -S pipewire-alsa
+```
+No daemon restart is needed — ALSA reads its config when an application opens the device — but any app that already failed has to be restarted to pick it up.
+
+Worth checking after any install where the audio stack was assembled package-by-package:
+```bash
+ls -la /etc/alsa/conf.d/ | grep 99-   # should show 99-pipewire-default.conf
+```
+
 ### Schiit Magni Unity mute workaround
 The Schiit Magni Unity exposes a USB Audio Class hardware mute control (visible to ALSA as `numid=2,iface=MIXER,name='PCM Playback Switch'`). When wireplumber translates a `wpctl set-mute` into a toggle of that hardware control, the Magni Unity's anti-pop output relay engages — and on unmute, the relay does not reliably release. The software state correctly reports "unmuted" while the analog stage stays silent until the USB device is reinitialized (a reboot, a USB replug, or a profile bounce).
 
@@ -201,6 +234,7 @@ This is probably a good time to go about setting up yay so I can use it for inst
 
 ### Useful Sound utilities
 - `pipewire-pulse` Some games / applications might expect to still talk to pulseaudio, so this compatibility layer sets that up for them.
+- `pipewire-alsa` The equivalent compatibility layer for applications that talk raw ALSA. Easy to overlook because the other pipewire packages install fine without it — see the section above for the confusing failure mode it causes.
 - `wiremix` a feature rich TUI with the ability to set default sources and sinks and even do application specific routing of sources of sinks. This is like the old pavucontrol!
 - `qpwgraph` A utility that has been useful so far in ensuring I have the right sets of inputs and outputs hooked up together.
 
