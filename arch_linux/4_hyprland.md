@@ -65,9 +65,9 @@ First I installed dunst and libnotify:
 sudo pacman -S dunst libnotify
 ```
 
-Dunst is added to Hyprland autostart in `hyprland.conf`:
-```bash
-exec-once = dunst
+Dunst is added to Hyprland autostart in `hyprland.lua`:
+```lua
+hl.exec_cmd("dunst")
 ```
 
 ## Installing AGS

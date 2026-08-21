@@ -1,5 +1,4 @@
--- Hyprland configuration (Lua form)
--- Translated from hyprland.conf. See https://wiki.hypr.land/Configuring/Start/
+-- Hyprland configuration. See https://wiki.hypr.land/Configuring/Start/
 -- Reference sample: /usr/share/hypr/hyprland.lua
 
 -------------------------------
@@ -50,6 +49,12 @@ local menu        = "rofi -show combi -modes combi -combi-modes \"window,drun,ru
 local lockmgr     = "hyprlock"
 local webBrowser  = "firefox"
 
+-- Hyprland points spawned children's stdout/stderr at /dev/null. Wrapping a
+-- command sends its output to the journal instead: journalctl -t <tag>
+local function logged(tag, cmd)
+    return "systemd-cat -t " .. tag .. " " .. cmd
+end
+
 
 -------------------
 ---- AUTOSTART ----
@@ -61,12 +66,13 @@ hl.on("hyprland.start", function()
     -- know they're in a Wayland session. Without this, the GTK portal times out
     -- trying to connect to X11, causing ~50 second delays on keybind app launches.
     hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_SESSION_DESKTOP GDK_BACKEND")
-    hl.exec_cmd("hypridle")
+    -- systemctl units log to the journal on their own; the rest need wrapping.
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
     hl.exec_cmd("systemctl --user start xdg-desktop-portal-hyprland")
-    hl.exec_cmd("hyprpaper")
-    hl.exec_cmd("dunst")
-    hl.exec_cmd("ags run")
+    hl.exec_cmd(logged("hypridle",  "hypridle"))
+    hl.exec_cmd(logged("hyprpaper", "hyprpaper"))
+    hl.exec_cmd(logged("dunst",     "dunst"))
+    hl.exec_cmd(logged("ags",       "ags run"))
 end)
 
 
@@ -264,7 +270,7 @@ local function bind(keys, action, opts)  hl.bind(mainMod .. " + " .. keys, actio
 local function sbind(keys, action, opts) hl.bind(mainMod .. " + SHIFT + " .. keys, action, opts) end
 
 -- Top level / System level commands
-bind ("Escape",   hl.dsp.exec_cmd(lockmgr))
+bind ("Escape",   hl.dsp.exec_cmd(logged("hyprlock", lockmgr)))
 sbind("Escape",   hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 sbind("S",        hl.dsp.window.move({ workspace = 10 }))
 bind ("T",        hl.dsp.exec_cmd(terminal))

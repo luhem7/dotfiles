@@ -36,6 +36,7 @@ The numbered markdown files are meant to be read in order; they document a from-
 - **`2_dev.md`** — Dev environment: JetBrainsMono Nerd Font + fontconfig, zsh plugins (syntax highlighting, autosuggestions), Ghostty config, VirtualBox, Podman (with `crun`), Node via `nvm`, Neovim + Lazy + `tree-sitter-cli` + `wl-clipboard`, and modern CLI replacements (`lsd`, `bat`, `ripgrep`, `fzf`, `btop`, `dust`, `procs`, `yazi` w/ toggle-pane plugin).
 - **`3_gaming.md`** — Steam, locking the monitor to 3440x1440@164.9Hz in Hyprland, `gamescope` + `gamemode` install/group setup, and the recommended Steam per-game launch command.
 - **`4_hyprland.md`** — Ricing/aesthetics: Gruvbox Material palette (with exact hex values), typography rules, design principles, solar-aware hour-segment concept, Dunst notifications, AGS (Aylur's GTK Shell) + Astal tray/wireplumber libs, `trash-cli`, and Rofi (with `rofi-emoji` and `rofi-calc`).
+- **`tips_and_tricks.md`** — Standalone (unnumbered) notes on techniques worth remembering, written in first person. Currently: using `systemd-cat` to recover logs from processes Hyprland spawns (it redirects their stdout/stderr to `/dev/null`).
 
 ### `arch_linux/config/` — application configs (deployed to `~/.config/`)
 
@@ -43,7 +44,7 @@ The numbered markdown files are meant to be read in order; they document a from-
 - `dunst/` — notification daemon
 - `fontconfig/` — fonts.conf (JetBrainsMono as default monospace)
 - `ghostty/` — Ghostty terminal
-- `hypr/` — Hyprland window manager (`hyprland.conf`, `hyprlock.conf`, `hypridle.conf`)
+- `hypr/` — Hyprland window manager (`hyprland.lua`, `hyprlock.conf`, `hypridle.conf`)
 - `kitty/` — Kitty terminal
 - `nvim/` — Neovim with Lazy plugin manager (`lua/config/lazy.lua`)
 - `rofi/` — Rofi application launcher

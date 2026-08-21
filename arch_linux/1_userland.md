@@ -129,17 +129,34 @@ echo -e "[Sleep]\nSuspendState=mem" | sudo tee /etc/systemd/sleep.conf.d/no-s2id
 
 This forces systemd to only use S3 (deep) sleep. If S3 fails, the suspend aborts cleanly rather than falling back to s2idle. No reboot required.
 
+## Preserving VRAM across suspend
+
+Forcing S3 (above) means the GPU loses power during sleep, so anything held in VRAM is discarded and has to be rebuilt on resume.
+
+**The catch:** `NVreg_PreserveVideoMemoryAllocations` already defaults to `1`, but that only declares the intent. The actual save/restore is done by systemd units shipped with `nvidia-utils`, and those are disabled by default.
+
+**The fix:**
+```bash
+sudo systemctl enable nvidia-suspend.service nvidia-resume.service nvidia-hibernate.service
+```
+
+`nvidia-suspend.service` runs before `systemd-suspend.service` and dumps VRAM to `NVreg_TemporaryFilePath` (`/var/tmp`, which is on the encrypted root here). `nvidia-resume.service` restores it on wake.
+
+**Tradeoff:** the dump goes to disk, so suspend time scales with how much VRAM is in use. An idle desktop (~1 GiB) costs a couple of seconds. A game or a local LLM holding 10–20 GiB can take tens of seconds and look like the machine has hung — it hasn't, it's still writing. That is also the case where preservation is most worth having, since the alternative is reloading all of it on resume.
+
 ## Setting up a Desktop
 I'm currently going with the [hyprland eco-system](https://wiki.archlinux.org/title/Hyprland). As noted on the page, it is good to take a look at the [Hyprland Nvidia page](https://wiki.hypr.land/Nvidia/), but I had already implemented the recommendations here!
 
+Hyprland 0.55 deprecated the old hyprlang `hyprland.conf` format in favour of Lua, and no longer ships a sample `hyprland.conf` at all. `hyprland.lua` is the only config this setup uses.
+
 Next, I copied a default Hyprland config over to my user config:
 ```bash
-cp /usr/share/hypr/hyprland.conf ~/.config/hypr/hyprland.conf
+cp /usr/share/hypr/hyprland.lua ~/.config/hypr/hyprland.lua
 ```
 and then I added the following lines to the top of that file
-```
-env = LIBVA_DRIVER_NAME,nvidia
-env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+```lua
+hl.env("LIBVA_DRIVER_NAME",         "nvidia")
+hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
 ```
 But really, this is already present in the included hyprland config in this repo.
 
@@ -161,6 +178,24 @@ First, copy over the config files in this repo to `~/.config/hypr/`. Then instal
 sudo pacman -S hyprlock hypridle
 ```
 Logout of the desktop and login to verify that these changes have taken effect.
+
+**Where hypridle runs from, and where to find its logs**
+
+hypridle is started by Hyprland itself, from the autostart section of `hyprland.lua`. That is the correct choice for this setup: the wiki only recommends `systemctl --user enable --now hypridle.service` when Hyprland is launched through uwsm, and this machine starts it manually with `start-hyprland` instead.
+
+Hyprland does not forward stdout or stderr from the processes it spawns — it points them at `/dev/null`. Left alone, hypridle's logs are therefore discarded completely: not in the journal, not in `hyprland.log`, nowhere. Since those logs are the only way to debug the lock-before-sleep path, pipe it through `systemd-cat` so its output lands in the journal under its own tag:
+```lua
+hl.exec_cmd("systemd-cat -t hypridle hypridle")
+```
+```bash
+journalctl -t hypridle -f
+```
+
+Do not use `systemctl --user start hypridle` to pick up a config change. That launches a *second* daemon alongside the one Hyprland already spawned, and both will hold sleep inhibitors and fire their own lock commands, which breaks locking in confusing ways. To reload the config, replace the running instance:
+```bash
+pkill hypridle
+hyprctl dispatch 'hl.dsp.exec_cmd("systemd-cat -t hypridle hypridle")'
+```
 
 
 
