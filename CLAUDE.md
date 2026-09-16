@@ -60,6 +60,7 @@ The numbered markdown files are meant to be read in order; they document a from-
   - `audio-mute-toggle.sh` — workaround for Schiit Magni Unity stuck mute relay (profile bounce on unmute)
   - `fix_lens.zsh` — webcam/lens fix utility
   - `restart-blue-mic.sh` + `restart-blue-mic.service` — systemd unit to recover the Blue mic when it gets wedged
+  - `usb-drive.sh` — `-m`/`-u` to mount/unmount the USB drive at `/mnt/usb`, running `cryptsetup open`/`close` only when the partition is LUKS
 - **`arch_linux/kernel_params/`** — currently empty; reserved for kernel cmdline drop-ins (the live ones documented in the guides live under `/etc/cmdline.d/`).
 - **`arch_linux/.claude/`** — Claude Code project metadata.
 
