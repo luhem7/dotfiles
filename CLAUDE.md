@@ -46,6 +46,7 @@ The numbered markdown files are meant to be read in order; they document a from-
 - `ghostty/` — Ghostty terminal
 - `hypr/` — Hyprland window manager (`hyprland.lua`, `hyprlock.conf`, `hypridle.conf`)
 - `kitty/` — Kitty terminal
+- `mpv/` — mpv video player (`mpv.conf` currently forces `gpu-api=opengl` as a temporary NVIDIA Vulkan workaround)
 - `nvim/` — Neovim with Lazy plugin manager (`lua/config/lazy.lua`)
 - `rofi/` — Rofi application launcher
 - `swayimg/` — image viewer
