@@ -8,8 +8,18 @@ import Quickshell.Hyprland
 // Quickshell doesn't track `activespecial` itself, so re-read the monitors'
 // IPC objects whenever Hyprland announces a change; `specialWorkspace.name` is
 // empty while it is hidden.
+//
+// `active` is assigned from handlers rather than bound: as a binding it was
+// re-evaluated while a reload tore down the previous config, logging
+// "Unable to assign [undefined] to bool".
 Singleton {
-	readonly property bool active: !!Hyprland.focusedMonitor?.lastIpcObject?.specialWorkspace?.name
+	id: root
+
+	property bool active: false
+
+	function refresh() {
+		active = !!Hyprland.focusedMonitor?.lastIpcObject?.specialWorkspace?.name;
+	}
 
 	function toggle(workspaceName: string) {
 		const name = workspaceName.replace(/^special:/, "");
@@ -24,7 +34,22 @@ Singleton {
 		function onRawEvent(event) {
 			if (event.name.startsWith("activespecial")) Hyprland.refreshMonitors();
 		}
+
+		function onFocusedMonitorChanged() {
+			root.refresh();
+		}
 	}
 
-	Component.onCompleted: Hyprland.refreshMonitors()
+	Connections {
+		target: Hyprland.focusedMonitor
+
+		function onLastIpcObjectChanged() {
+			root.refresh();
+		}
+	}
+
+	Component.onCompleted: {
+		Hyprland.refreshMonitors();
+		refresh();
+	}
 }

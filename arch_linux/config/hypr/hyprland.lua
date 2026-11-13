@@ -72,7 +72,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd(logged("hypridle",  "hypridle"))
     hl.exec_cmd(logged("hyprpaper", "hyprpaper"))
     hl.exec_cmd(logged("dunst",     "dunst"))
-    hl.exec_cmd(logged("ags",       "ags run"))
+    hl.exec_cmd(logged("quickshell", "qs"))
 end)
 
 
