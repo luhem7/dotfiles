@@ -41,6 +41,13 @@ Then restart networkd:
 sudo systemctl restart systemd-networkd
 ```
 
+### Keeping the clock in sync
+`systemd-timesyncd` ships with `systemd` but is disabled on a fresh install, so the clock free-runs and drifts (mine was ~1.5 minutes ahead). Enable it:
+```bash
+sudo systemctl enable --now systemd-timesyncd
+```
+Verify with `timedatectl` — you want `System clock synchronized: yes` and `NTP service: active`. The first sync can take a few seconds after starting; `timedatectl timesync-status` shows which server it used.
+
 **TODO** Setup firewalls here when you decide to open up this system to LAN.
 
 
