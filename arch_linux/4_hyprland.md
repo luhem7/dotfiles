@@ -70,29 +70,25 @@ Dunst is added to Hyprland autostart in `hyprland.lua`:
 hl.exec_cmd("dunst")
 ```
 
-## Installing AGS
-I installed AGS via yay:
+## Quickshell
+The bar is built with [Quickshell](https://quickshell.org), a QtQuick toolkit for desktop shells configured in QML. Its built-in services cover PipeWire audio, MPRIS media, the system tray, desktop entries and Hyprland IPC, and its Hyprland integration keeps up with Hyprland's IPC changes, so no extra libraries are needed:
 ```bash
-yay -S aylurs-gtk-shell
+sudo pacman -S quickshell
 ```
 
-For system tray support, install the Astal tray library:
-```bash
-yay -S libastal-tray-git
+The config is copied from `config/quickshell/` to `~/.config/quickshell/`, which `qs` loads by default. It is started from the Hyprland autostart in `hyprland.lua`:
+```lua
+hl.exec_cmd(logged("quickshell", "qs"))
 ```
 
-For audio/volume control with PipeWire/WirePlumber:
-```bash
-yay -S libastal-wireplumber-git
-```
+Quickshell reloads the config whenever one of its files changes, and `qs log` prints the running instance's log. To try a config without copying it, run `qs -p <path-to-config-dir>`.
 
-For the MPRIS now-playing widget (shows current track + prev/play-pause/next in the bar):
-```bash
-yay -S quarrel libastal-mpris-git
-```
-
-### AGS Bar Configuration
-The AGS bar configuration lives in `~/.config/ags/` with the following structure:
+The config is laid out as:
+- `shell.qml` — creates one `Bar` per screen
+- `Bar.qml` — the panel and its layout
+- `components/` — `Theme` (colors, sizes, `fontScale`), Nerd Font `Icons`, and shared widgets
+- `modules/` — one file per bar section (workspaces, window title, media, audio, tray, clock, …)
+- `services/` — shared state: special workspace, screen recorder, sunrise/sunset times
 
 ## System Trash
 I decided to use the `trash-cli` package in order to move things to a system trash instead of using `rm` for everything.
@@ -109,4 +105,4 @@ For Apple Music on Linux I use [Sidra](https://github.com/wimpysworld/sidra) —
 ```bash
 yay -S sidra-bin
 ```
-Why this matters for the bar: Apple Music inside Firefox/Chromium exposes MPRIS via the browser's MediaSession bridge, and music.apple.com's MediaSession implementation is buggy — `nexttrack`/`previoustrack` handlers stop playback instead of advancing, and `setPositionState` reports `mpris:length` inconsistently (sometimes `-1`, sometimes the wrong units). Sidra owns the player state directly, so the AGS media widget's skip buttons and any future track-progress visualisation actually work.
+Why this matters for the bar: Apple Music inside Firefox/Chromium exposes MPRIS via the browser's MediaSession bridge, and music.apple.com's MediaSession implementation is buggy — `nexttrack`/`previoustrack` handlers stop playback instead of advancing, and `setPositionState` reports `mpris:length` inconsistently (sometimes `-1`, sometimes the wrong units). Sidra owns the player state directly, so the bar's media skip buttons and track-progress line actually work.
