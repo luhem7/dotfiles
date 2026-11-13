@@ -9,3 +9,4 @@ testing_zsh.sh
 .npmrc
 
 .DS_STORE
+__pycache__/

@@ -58,6 +58,8 @@ The numbered markdown files are meant to be read in order; they document a from-
 
 - **`arch_linux/polkit/`** — Polkit rules. `10-enable-suspend-wheel.rules` allows wheel-group passwordless suspend.
 - **`arch_linux/utils/`** — Scripts and systemd units:
+  - `android-tv-emu.sh` — `setup` installs a Google TV emulator via Google's official SDK (user-space under `~/Android/Sdk`, KVM-backed); otherwise runs it, cold booting unless `--snapshot`. Traffic goes through `mitmdump` by default, logging to `/tmp/android-tv-proxy-*.log` with LAN blocked (`--allow-lan` to permit, `-np`/`--no-proxy` to skip). Emulator args go after `--`
+  - `android-tv-proxy.py` — mitmdump add-on used by the default proxied run: passes TLS through undecrypted while logging its SNI hostname, and refuses connections to private/LAN addresses unless its `allow_lan` option is set
   - `audio-mute-toggle.sh` — workaround for Schiit Magni Unity stuck mute relay (profile bounce on unmute)
   - `fix_lens.zsh` — webcam/lens fix utility
   - `restart-blue-mic.sh` + `restart-blue-mic.service` — systemd unit to recover the Blue mic when it gets wedged
